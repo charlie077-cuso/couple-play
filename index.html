@@ -657,4 +657,91 @@ build=function(){
  window.__ov=function(){var r={};for(k in O)r[k]=O[k].length;return r};
  console.log("OVAR "+n);
 })();
+
+(function(){
+ if(typeof BMAP!=="object")return;
+ var V=["声音轻一点","说完看着我","慢一点说","说完停一下","别移开视线","说完笑一下","说完做个深呼吸"];
+ var A=["动作慢一点","然后看着我","别着急","中间可以停一下","做完抱住我","慢慢来","看着我做完"];
+ var STRIP=/^(然后|说完|中间|全程|结束时|保持|限时|最后|别|慢慢|一直|自己|收尾|视线|声音|动作|做完)/;
+ var VERBAL=/说|告诉|回答|念|求|喊|叫|问|介绍|承诺|夸|形容|描述|读|数|唱/;
+ function base(s){
+  s=s.split("说请命令我").join("说：请命令我");
+  var p=s.split(" ");
+  if(p.length>1&&STRIP.test(p[p.length-1]))p.pop();
+  return p.join(" ");
+ }
+ var k,i,j,n=0;
+ for(k in O){
+  var arr=O[k],out=[],seen={};
+  for(i=0;i<arr.length;i++){
+   var b=base(arr[i]),T2=VERBAL.test(b)?V:A;
+   for(j=0;j<T2.length;j++){
+    var v=b+" "+T2[j];
+    if(seen[v])continue;seen[v]=1;out.push(v);BMAP[v]=b;n++;
+   }
+  }
+  O[k]=out;
+ }
+ for(k in D)D[k]=D[k].map(function(s){return s.split("说请命令我").join("说：请命令我")});
+ window.__ov=function(){var r={};for(k in O)r[k]=O[k].length;return r};
+ console.log("OVAR3 "+n);
+})();
+
+(function(){
+ if(typeof BMAP!=="object")return;
+ var V=["声音轻一点","说完看着我","慢慢说","说完停一下","别移开视线","说完笑一下","说完做个深呼吸","说完等我说好","说的时候看着我"];
+ var A=["动作慢一点","然后看着我","别着急","中间可以停一下","做完抱住我","慢慢来","看着我做完","做完告诉我你的感觉","中间可以歇十秒","结束的时候亲我一下"];
+ var TW=/^(然后|说完|中间|全程|结束时|保持|限时|最后|别|慢慢|一直|自己|收尾|视线|声音|动作|做完|说的?.?时候)/;
+ var VERBAL=/说|告诉|回答|念|求|喊|叫|问|介绍|承诺|夸|形容|描述|读|唱/;
+ function base(s){
+  s=s.split("说请命令我").join("说：请命令我");
+  var p=s.split(" "),guard=0;
+  while(p.length>1&&TW.test(p[p.length-1])&&guard++<4)p.pop();
+  return p.join(" ");
+ }
+ var k,i,j,n=0;
+ for(k in O){
+  var arr=O[k],out=[],seen={};
+  for(i=0;i<arr.length;i++){
+   var b=base(arr[i]),T2=VERBAL.test(b)?V:A;
+   for(j=0;j<T2.length;j++){
+    var v=b+" "+T2[j];
+    if(seen[v])continue;seen[v]=1;out.push(v);BMAP[v]=b;n++;
+   }
+  }
+  O[k]=out;
+ }
+ window.__ov=function(){var r={};for(k in O)r[k]=O[k].length;return r};
+ console.log("OVAR4 "+n);
+})();
+
+(function(){
+ if(typeof BMAP!=="object")return;
+ var V=["声音轻一点","说完看着我","慢慢说","说完停一下","别移开视线","说完笑一下","说完做个深呼吸","说完等我说好","说的时候看着我"];
+ var A=["动作慢一点","然后看着我","别着急","中间可以停一下","做完抱住我","慢慢来","看着我做完","做完告诉我你的感觉","中间可以歇十秒","结束的时候亲我一下"];
+ var TW=/^(然后|说完|说的时候|说出来|说出来之后|中间|全程|结束|保持|限时|最后|别|慢慢|慢一点|动作|做完|看着我|声音|视线|收尾|自己|停下来|说一句)/;
+ var VERBAL=/说|告诉|回答|念|求|喊|叫|问|介绍|承诺|夸|形容|描述|读|唱/;
+ function base(s){
+  s=s.split("说请命令我").join("说：请命令我");
+  var p=[],guard=0;
+  var all=s.split(" ");
+  for(var q=0;q<all.length;q++)if(all[q])p.push(all[q]);
+  while(p.length>1&&TW.test(p[p.length-1])&&guard++<6)p.pop();
+  return p.join(" ");
+ }
+ var k,i,j,n=0;
+ for(k in O){
+  var arr=O[k],out=[],seen={};
+  for(i=0;i<arr.length;i++){
+   var b=base(arr[i]),T2=VERBAL.test(b)?V:A;
+   for(j=0;j<T2.length;j++){
+    var v=b+" "+T2[j];
+    if(seen[v])continue;seen[v]=1;out.push(v);BMAP[v]=b;n++;
+   }
+  }
+  O[k]=out;
+ }
+ window.__ov=function(){var r={};for(k in O)r[k]=O[k].length;return r};
+ console.log("OVAR5 "+n);
+})();
 </script></body></html>
