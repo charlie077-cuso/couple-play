@@ -564,4 +564,97 @@ build=function(){
  for(k in T)T[k]=cut(T[k]);for(k in D)D[k]=cut(D[k]);for(k in O)O[k]=cut(O[k]);for(k in PU)PU[k]=cut(PU[k]);for(k in C)C[k]=cut(C[k],1);
  window.__cut3=removed;console.log("SEX3_REMOVED="+removed.length);window.__c3=removed.join(" | ");
 })();
+
+(function(){
+ var MAP=[
+  [/做完再重复一遍/g,"然后再做一遍"],
+  [/做完说一声好了/g,"然后说一句好的"],
+  [/做完说一句感觉/g,"然后说一下你的感觉"],
+  [/做完说一句。/g,"然后再做一次。"],
+  [/做完问我满不满意/g,"然后问我满不满意"],
+  [/做完告诉我什么感觉/g,"然后告诉我你的感觉"],
+  [/做完之后/g,"然后"],
+  [/做完了/g,"好了"],
+  [/做完/g,"然后"],
+  [/演完之后/g,"结束以后"],
+  [/演完让我牵你起来/g,"然后让我牵你起来"],
+  [/演完亲我一下再退场/g,"然后亲我一下再退场"],
+  [/演完再看我一眼/g,"然后看我一眼"],
+  [/演完了/g,"好了"],
+  [/演完/g,"然后"]
+ ];
+ function fix(s){
+  if(typeof s!=="string")return s;
+  for(var i=0;i<MAP.length;i++)s=s.replace(MAP[i][0],MAP[i][1]);
+  s=s.replace(/然后然后/g,"然后");
+  s=s.replace(/然后([，。])/g,"$1");
+  s=s.replace(/，s*。/g,"。");
+  s=s.replace(/s+/g," ").trim();
+  s=s.replace(/^然后/,"");
+  return s;
+ }
+ var k;
+ for(k in T)T[k]=T[k].map(fix);
+ for(k in D)D[k]=D[k].map(fix);
+ for(k in O)O[k]=O[k].map(fix);
+ for(k in PU)PU[k]=PU[k].map(fix);
+ for(k in C)C[k]=C[k].map(function(o){o.s=fix(o.s||"");return o});
+ window.__polishLeft=function(){var n=0;function cnt(a){return a.filter(function(x){var t=typeof x==="string"?x:(x.s||"");return /做完|演完|之后/.test(t)}).length}
+  for(k in T)n+=cnt(T[k]);for(k in D)n+=cnt(D[k]);for(k in O)n+=cnt(O[k]);for(k in PU)n+=cnt(PU[k]);for(k in C)n+=cnt(C[k]);return n};
+ console.log("POLISHED");
+})();
+
+(function(){
+ var TAILS=["然后看我一眼","然后看着我","然后告诉我什么感觉","然后告诉我你的感觉","然后亲我一下","然后抱我一下","然后问我满不满意","然后说一句好的","然后再做一遍","然后告诉我一声","然后笑一下"];
+ var DUP=/然后|看着我|看我一眼|告诉我|亲我一下|抱我一下|问我|说一句|笑一下/;
+ function cut(s){
+  var changed=true;
+  while(changed){
+   changed=false;
+   for(var i=0;i<TAILS.length;i++){
+    var t=TAILS[i];
+    if(s.length>t.length+1&&s.slice(-(t.length+1))===" "+t){
+     var base=s.slice(0,-(t.length+1));
+     if(DUP.test(base.slice(-14))){s=base;changed=true;break}
+    }
+   }
+  }
+  s=s.replace(/然后 然后/g,"然后").replace(/然后然后/g,"然后");
+  s=s.replace(/ {2,}/g," ");
+  return s;
+ }
+ var k;
+ for(k in T)T[k]=T[k].map(cut);
+ for(k in D)D[k]=D[k].map(cut);
+ for(k in O)O[k]=O[k].map(cut);
+ for(k in PU)PU[k]=PU[k].map(cut);
+ for(k in C)C[k]=C[k].map(function(o){o.s=cut(o.s||"");return o});
+ window.__left=function(){
+  var res=[],re=/做完|演完|之后/;
+  function scan(a){for(var i=0;i<a.length;i++){var t=typeof a[i]==="string"?a[i]:(a[i].s||"");if(re.test(t))res.push(t)}}
+  for(k in T)scan(T[k]);for(k in D)scan(D[k]);for(k in O)scan(O[k]);for(k in PU)scan(PU[k]);for(k in C)scan(C[k]);
+  return res};
+ console.log("POLISH2");
+})();
+
+(function(){
+ if(typeof BMAP!=="object")return;
+ var TL=["然后停两秒","说完看着我","声音轻一点","说完笑一下","慢慢说出来","说完靠到我身上","中间可以停顿一次","说完等我点头","做完这段先抱一下","最后再看我一眼","全程别笑","视线别移开","说完自己数三个数","说完做个深呼吸","说完握一下我的手","保持这个姿势十秒","然后轻轻松开","说的时候别停手","说完问我要不要继续","收尾的时候亲我一下"];
+ var STRIP=/^(然后|说完|中间|全程|结束时|保持|限时|最后|别|慢慢|一直|自己|收尾|视线|声音|做完|做完这段)/;
+ var k,n=0;
+ function base(s){var p=s.split(" ");if(p.length>1&&STRIP.test(p[p.length-1]))p.pop();return p.join(" ")}
+ for(k in O){
+  var arr=O[k],out=[],seen={};
+  for(var i=0;i<arr.length;i++){
+   var b=base(arr[i]);
+   for(var j=0;j<TL.length;j++){
+    var v=b+" "+TL[j];
+    if(seen[v])continue;seen[v]=1;out.push(v);BMAP[v]=b;n++;
+   }
+  }
+  O[k]=out;
+ }
+ window.__ov=function(){var r={};for(k in O)r[k]=O[k].length;return r};
+ console.log("OVAR "+n);
+})();
 </script></body></html>
