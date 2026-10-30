@@ -1,0 +1,345 @@
+<!DOCTYPE html><html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes"><title>Couple Play</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;
+background:radial-gradient(120% 80% at 50% 0%,#31101f 0%,#17070d 55%,#0b0407 100%);color:#f7eaf0;
+display:flex;justify-content:center;overflow:hidden}
+.wrap{width:100%;max-width:470px;height:100vh;padding:18px 18px 22px;display:flex;flex-direction:column;position:relative;overflow:hidden}
+.screen{display:none;flex:1;flex-direction:column;justify-content:center;min-height:0}
+.screen.show{display:flex}
+.brand{font-size:12px;letter-spacing:3px;color:#ff7dab;text-transform:uppercase;margin-bottom:10px}
+h1{font-size:27px;margin:0 0 14px;font-weight:650;letter-spacing:1px}
+.row{display:flex;gap:10px;margin-bottom:16px}
+input{flex:1;min-width:0;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);
+color:#fff;border-radius:14px;padding:14px 12px;font-size:15px;outline:none}
+input:focus{border-color:#ff5c92}
+.lbl{font-size:12px;color:#b99;letter-spacing:2px;margin:4px 0 8px}
+.seg{display:flex;gap:6px;background:rgba(255,255,255,.05);padding:5px;border-radius:14px;margin-bottom:14px}
+.seg button{flex:1;border:0;background:transparent;color:#c9a7b4;font-size:12px;padding:11px 1px;border-radius:10px;font-family:inherit}
+.seg button.on{background:linear-gradient(135deg,#ff4f86,#c2185b);color:#fff;font-weight:600;box-shadow:0 4px 14px rgba(255,79,134,.35)}
+.cta{width:100%;border:0;border-radius:16px;padding:17px;font-size:17px;font-weight:650;color:#fff;font-family:inherit;
+background:linear-gradient(135deg,#ff4f86,#b3125a);box-shadow:0 8px 24px rgba(255,79,134,.28);margin-top:6px}
+.note{font-size:11px;color:#8d6b78;line-height:1.7;margin-top:16px;text-align:center}
+.top{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#c78ba2;letter-spacing:1px;margin-bottom:10px}
+.bar{height:4px;background:rgba(255,255,255,.08);border-radius:4px;overflow:hidden;margin-bottom:12px}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ff4f86,#ffb27d);transition:width .3s}
+.score{text-align:center;font-size:12px;color:#b98a9c;margin-bottom:10px;letter-spacing:.5px}
+.card{background:linear-gradient(160deg,rgba(255,255,255,.10),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.10);
+border-radius:22px;padding:22px 20px;min-height:210px;display:flex;flex-direction:column;justify-content:center;
+box-shadow:0 18px 40px rgba(0,0,0,.35)}
+.card.pop{animation:pop .28s ease}
+@keyframes pop{0%{transform:scale(.97);opacity:.5}100%{transform:scale(1);opacity:1}}
+.tag{font-size:11px;letter-spacing:2px;color:#ff9cc0;margin-bottom:12px}
+.tag.dare{color:#ffb27d}
+.tag.scene{color:#b39ddb}
+.q{font-size:19px;line-height:1.62;font-weight:500}
+.extra{font-size:12.5px;color:#d18aa6;margin-top:14px;line-height:1.6}
+.who{text-align:center;font-size:13px;color:#c79;margin:14px 0 4px;letter-spacing:.5px}
+.btns{display:flex;gap:10px;margin-top:12px}
+.btns button{flex:1;border:0;border-radius:16px;padding:16px;font-size:16px;font-family:inherit;font-weight:600}
+.no{background:rgba(255,255,255,.07);color:#c7a3b1}
+.ok{background:linear-gradient(135deg,#ff4f86,#b3125a);color:#fff;box-shadow:0 8px 22px rgba(255,79,134,.3)}
+.gt{font-size:24px;text-align:center;margin-bottom:22px;font-weight:650}
+.big{font-size:20px;line-height:1.6;margin-bottom:16px}
+.stats{font-size:14px;color:#c8a3b2;line-height:2;margin-bottom:18px}
+.toast{position:absolute;left:18px;right:18px;bottom:100px;background:rgba(255,79,134,.16);border:1px solid rgba(255,79,134,.4);
+color:#ffd6e3;font-size:13.5px;line-height:1.6;padding:12px 14px;border-radius:14px;opacity:0;transform:translateY(8px);
+transition:.25s;pointer-events:none}
+.toast.on{opacity:1;transform:translateY(0)}
+
+.wrap{--a:#ff4f86;--a2:#b3125a;--ag:rgba(255,79,134,.30);--as:rgba(255,79,134,.10)}
+.wrap[data-t="1"]{--a:#5cc8ff;--a2:#1a6bd0;--ag:rgba(92,200,255,.30);--as:rgba(92,200,255,.10)}
+.card{border:1px solid var(--a);transition:border-color .35s,box-shadow .35s}
+.turnbar{display:flex;align-items:center;justify-content:center;gap:9px;margin:0 0 12px;font-size:12.5px;color:#c9a7b4;letter-spacing:1px}
+.turnbar b{color:#160610;background:var(--a);padding:5px 13px;border-radius:999px;font-weight:700;box-shadow:0 4px 14px var(--ag);transition:background .35s}
+.turnbar em{font-style:normal;font-size:11px;letter-spacing:2px;color:#e8c9d6;opacity:.75}
+.turnbar.flash b{animation:tflash .42s ease}
+@keyframes tflash{0%{transform:scale(.88)}60%{transform:scale(1.07)}100%{transform:scale(1)}}
+.who{color:var(--a);transition:color .35s}
+.score span{padding:2px 9px;border-radius:9px;transition:.3s}
+.score span.on{color:#fff;background:var(--as);font-weight:700}
+.score i{font-style:normal;opacity:.4;margin:0 4px}
+.extra{display:none}
+.extra.scene{display:block;text-align:left;background:rgba(179,157,219,.12);border:1px solid rgba(179,157,219,.32);border-radius:12px;padding:10px 12px;color:#d6c9f2}
+.extra.pen{display:flex;gap:8px;align-items:flex-start;text-align:left;background:linear-gradient(135deg,rgba(255,176,72,.16),rgba(255,110,60,.06));border:1px solid rgba(255,176,72,.42);border-radius:12px;padding:10px 12px}
+.extra.pen .ptag{flex:0 0 auto;font-size:10px;letter-spacing:1px;background:#ffb04a;color:#2a1200;border-radius:6px;padding:3px 6px;font-weight:700;margin-top:1px}
+.extra.pen .ptx{font-size:13.5px;line-height:1.55;color:#ffe6c6}
+.toast.pen{background:linear-gradient(135deg,rgba(255,176,72,.20),rgba(255,90,60,.12));border-color:rgba(255,176,72,.55);color:#ffe6c6}
+
+.penwrap{display:none;margin-top:12px;border-radius:16px;padding:12px 14px;background:linear-gradient(135deg,rgba(255,176,72,.13),rgba(255,110,60,.05));border:1px solid rgba(255,176,72,.38)}
+.penwrap.on{display:block}
+.penwrap .phd{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}
+.penwrap b{font-size:10.5px;letter-spacing:1.5px;background:#ffb04a;color:#2a1200;border-radius:6px;padding:3px 7px;font-weight:700}
+.penwrap span{font-size:10.5px;color:#c99a6a;letter-spacing:.5px}
+.penwrap .ptx{font-size:13.5px;line-height:1.62;color:#ffe6c6}
+.penwrap.act{border-color:rgba(255,176,72,.85);animation:penpulse 1.8s ease infinite}
+@keyframes penpulse{0%,100%{box-shadow:0 0 0 2px rgba(255,176,72,.20)}50%{box-shadow:0 0 0 5px rgba(255,176,72,.06)}}
+.penok{background:linear-gradient(135deg,#ffb04a,#e2611c)!important;box-shadow:0 8px 22px rgba(255,140,60,.35)!important;color:#241000!important}
+</style></head><body><div class="wrap">
+<div class="screen show" id="setup">
+<div class="brand">Couple Play</div><h1>今晚，玩点真的</h1>
+<div class="row"><input id="n1" maxlength="8" placeholder="你的名字"><input id="n2" maxlength="8" placeholder="TA 的名字"></div>
+<div class="lbl">玩法</div>
+<p style="font-size:12px;color:#a08a96;margin:0 0 8px;text-align:center">「我」＝这轮读卡的人，「你」＝对面的人，照着念就行。</p><div class="seg" id="mode"><button data-v="truth" class="on">真心话</button><button data-v="dare">大冒险</button><button data-v="order">命令</button><button data-v="scene">剧本</button></div>
+<div class="lbl">氛围</div>
+<div class="seg" id="lvl"><button data-v="x">温柔</button><button data-v="z" class="on">亲密</button><button data-v="w">热烈</button></div>
+<button class="cta" id="start">开始</button>
+<div class="note">成年人之间的游戏 · 双方自愿 · 随时可以叫停<br>「热烈」档包含明确成人内容</div>
+</div>
+<div class="screen" id="play">
+<div class="top"><span id="modeName"></span><span id="stage"></span><span id="cnt"></span></div>
+<div class="bar"><i id="prog"></i></div>
+<div class="score" id="scoreT"><span id="sc1"></span><i>:</i><span id="sc2"></span></div>
+<div class="turnbar" id="turnbar"><span>轮到</span><b id="tname"></b><em id="trole"></em></div><div class="card" id="card"><div class="tag" id="tag"></div><div class="q" id="q"></div><div class="extra" id="extra"></div></div>
+<div class="who" id="who"></div>
+<div class="penwrap" id="penwrap"><div class="phd"><b id="ptag">跳过惩罚</b><span id="pnm"></span></div><div class="ptx" id="ptx"></div></div>
+<div class="btns" id="btnsmain"><button class="no" id="no">跳过</button><button class="ok" id="ok">完成</button></div>
+<div class="btns" id="penrow" style="display:none"><button class="ok penok" id="penok">完成惩罚</button></div>
+</div>
+<div class="screen" id="gate"><div class="gt" id="gtitle"></div><button class="cta" id="gbtn">进入下一关</button></div>
+<div class="screen" id="end"><div class="brand">今晚结束</div><div class="big" id="verdict"></div><div class="stats" id="stats"></div><button class="cta" id="again">再来一局</button></div>
+<div class="toast" id="toast"></div>
+</div>
+<script>
+var T={"g":["第一次见到我，你的第一反应是什么？","我做的哪件小事，让你觉得就是这个人了？","你手机里给我的备注名是什么？","我们在一起的哪一天，你最想重播一遍？","你最想和我一起完成的一件小事是什么？","我说过的哪句话，你一直记着？","你最喜欢我哪一个瞬间的样子？","如果明天就能出发，你最想带我去哪？","你觉得我们最像的地方是什么？","你最想让我改掉哪个小习惯？（说了不许生气）","第一次牵我手的时候，你在想什么？","我们吵架时，你心里最想说的那句话是什么？","你偷偷为我做过、但没告诉我的事是什么？","你希望我多对你做的一件事是什么？","你手机相册里，我的照片大概有多少张？","什么味道会让你立刻想起我？","如果能回到我们的某一个瞬间，你选哪个？","我什么时候最让你心疼？","你最放松的时候，是在我面前做什么？","你有没有假装不喜欢、其实很喜欢的东西？","我们之间最默契的一件事是什么？","如果给你一整天空闲，你想和我怎么过？","你最怕哪一天我不在你身边？","你第一眼觉得我是什么性格？现在变了吗？","你偷偷给我起过什么外号？","你希望十年后的我们，是什么样子？","有什么想对我道歉、却一直没说出口的小事？","你在朋友面前，是怎么夸我的？","你最喜欢我怎么叫你？","我身上哪个小毛病，你其实觉得挺可爱？","你有没有因为我，偷偷改过自己？","我哪一次让你觉得特别有安全感？","你有没有在深夜偷偷翻我们的聊天记录？","如果一起养宠物，你想养什么、叫什么名字？","你第一次见我的时候，心里在想什么？","你觉得我最像什么动物？为什么？","我做的哪件小事让你记了很久？","你最喜欢我们待在一起的方式是什么？","你最想和我一起去哪里？","你有没有偷偷为我做过什么事？","你觉得我们最好笑的一次争吵是什么？","你希望我少做什么、多做什么？","你什么时候最觉得被我照顾到？","你最想我改掉哪个小习惯？","你最想我保留哪个小习惯？","你觉得我最不为人知的一面是什么？","你最想让我用什么方式夸你？","你希望我什么时候主动一点？","你最怕我哪一点？","你最想和我一起学什么？","你觉得我们俩谁更会哄人？","你最喜欢我做的哪一道菜？","你最想跟我一起看哪部电影？","你觉得我们最像哪一对情侣？","你最想让我记得你的哪一天？","你有没有因为一句话偷偷开心很久？","你希望我们十年后是什么样子？","你觉得我最需要被照顾的是哪里？","你最想被我怎样安慰？","你最喜欢我穿什么衣服？","你最想和我一起完成一件什么事？","你介意我哪一点，但一直没说？","你觉得我身上什么最吸引你？","你有没有觉得我们特别默契的一瞬间？","你手机里有没有一张照片，是我不知道你存的？","你第一次觉得完了、喜欢上这个人，是什么时候？","你觉得我在哪件事上特别轴？","你最想我陪你做什么，哪怕很无聊？","你有没有对我撒过善意的谎？","你最想让我知道的一件事是什么？","你觉得我们之间最不需要语言的一刻是什么？","你最想和我一起变老的样子是什么？","你有没有在我不注意的时候偷偷看我？","你最想我记住你哪句话？","你觉得我哪一次最狼狈？当时你想说什么？","你最想我学你哪一点？","你有没有为我争过一次，没告诉我？","你最想我们十年后一起做什么？","你觉得我们谁更离不开谁？","你最想我改口叫你什么？","你有没有过还好当时没放手的念头？","你最想和我在哪个城市定居？","你有没有偷偷哭过，因为想到我们？","你最想我对你说哪三个字？"],"h":["我哪个瞬间最让你心动？","你最喜欢我穿哪件衣服的样子？","你最喜欢我怎么叫你？","你最想吻我的是哪一个时刻？","你有没有在公共场合偷偷想亲我？","你更喜欢我主动，还是你自己主动？","你最想和我尝试什么新的约会方式？","你身上哪里最怕痒？","你想过和我一起做的一件有点冒险的事是什么？","我哪一次最让你吃醋？","你最喜欢我们接吻的方式吗？说说是哪种。","如果只能选一样，你要抱抱还是亲吻？","你最想听我对你说哪一句情话？","最近一次想我想到睡不着，是什么时候？","我哪一点让你觉得很性感？","你希望我穿什么颜色？","你有没有偷偷看我的侧脸看到发呆？","你最想收到我什么样的惊喜？","你最喜欢我头发的哪个部分？","如果我们被困在电梯里一小时，你会做什么？","你最想和我一起看什么类型的电影，看完之后呢？","你有什么小癖好，想让我知道？","你最喜欢我怎么靠着你？","你最希望我在你耳边说什么？","如果给你一次无理由索取的机会，你要什么？","我们之间最挠心的一次对视，是什么时候？","你偷偷保存过我的哪张照片？","你有没有梦到过我？梦到什么了？","你最喜欢我哪个表情？","你最想和我在哪座城市醒来？","你想在我们的纪念日做什么疯狂的事？","你希望我多一点撒娇，还是多一点霸道？"],"b":["你最想在什么场合吻我？","你有没有偷偷想我想到脸红？","你最想让我穿你的哪件衣服？","你最想被吻在什么位置？","描述一下你理想中的浪漫夜晚。","你想象过我们下次旅行会发生什么？","你最喜欢我什么时候的声音？","你最想让我对你说哪一句话？","你有没有在某些时刻突然很想我？说一个。","你最想和我做、但一直不敢开口的事是什么？","你最真诚地说说我哪个地方最吸引你。","你希望我主动到什么程度？","你有没有偷偷闻过我的衣服？","你最想和我一起挑战的第一次是什么？","如果我今晚只听你一个命令，你会说什么？","你最喜欢我们拥抱时的哪个角度？","你有没有因为想我而分心？举个例子。","你觉得我们之间最迷人的距离是多近？","你最想和我一起看日出还是看星星？","你希望我在什么时候格外主动？","你最想在什么情绪下吻我？","你希望我对你说想你的频率是多久一次？","你有没有想过把我介绍给全世界？","你最想和我一起完成的亲密小事是什么？","如果只能留一件我身上的东西，你要什么？","你最想让我在你耳边说的三个字是什么？"],"x":["你最想用什么姿势和我做？","你最想被我吻在哪儿，吻多久？","在床上你希望我快一点，还是慢一点？","你最近一次想着我，是在什么场景？","你更喜欢白天，还是深夜？","哪个动作最容易让你有反应？","你希望我说话，还是安静点？","你最想让我穿什么？","你想过在哪些地方和我做？说两个。","你最敏感的地方在哪儿？","你希望一次持续多久？","你有没有偷偷看过我换衣服？","你想让我在你身上留下痕迹吗？哪儿？","你更喜欢我主动，还是你来？","你最想让我叫你什么？","你希望我事前多说，还是直接用动作？","你有过中途走神吗？在想什么？","你最喜欢我哪个部位？","你最想在什么情绪下和我亲密？","你希望我多久主动一次？","你有没有装睡过？","你最想事后和我做什么？","我做什么会让你立刻有反应？","你最想被我怎么夸？","你最想我们在哪里开始？","你更喜欢我温柔一点，还是强势一点？","你希望我事前准备什么？","你喜欢开灯还是关灯？","你最想我吻你哪儿？","你希望我慢一点还是急一点？","你会因为我哪句话立刻有感觉？","你最想我们一起做什么新鲜的事？","你更喜欢早上还是晚上？","你希望我多盯着你看，还是少看？","你最想我记住你的什么反应？","你有没有觉得我某个动作特别撩？","你希望我主动多一点，还是你去撩我？","你最想在什么气氛下？","你有没有梦到过我们？","你觉得我们谁更容易先妥协？","你最想我事后跟你说什么？","你希望我提前告诉你要做什么，还是不说？","你最喜欢我什么声音？","你想过什么地点但一直没敢提？","你希望我们一周几次算刚好？","你最想我穿什么颜色的？","你有没有故意穿给我看过？","你最想我夸你哪儿？","你最喜欢我们哪一次？","你有过没尽兴的时候吗？缺什么？","你最想我们在什么情况下被打断？","你希望我事前穿什么？","你最想我吻你哪里，除了嘴？","你有没有想过在电影院？","你喜欢我出声吗？","你最想让我的手停在哪？","你希望我先问，还是直接做？","你最想我在什么时候说想你？","你最喜欢我们哪一种靠近方式？","你有没有假装睡着等我？","你最想我在你耳边哼什么？","你希望我们把灯全关，还是留一点？","你最想我抱你的姿势是哪种？","你有没有在意过我在床上的反应？","你最想我记住你的什么味道？","你希望我事后说什么？","你最想我们早上先做什么？","你有没有想过我在你身后？","你最喜欢我在你哪一侧？","你最想我多久说一次想你？","你有没有数过我们接吻的次数？","你希望我吻多久？","你最想我碰你哪里，但一直没说？","你有没有因为一句话脸红？"],"z":["你最想我怎么弄你？说清楚。","你更喜欢我用嘴，还是用手？","你到的时候希望我说什么？","你最喜欢我用什么姿势？","你希望我强硬到什么程度？","你最近一次自己解决，想的是什么画面？","你最想我按住你哪儿？","你喜欢我说脏话吗？哪一句最有效？","你最希望我从哪儿开始？","你最希望我结束时怎么做？","你最喜欢我什么表情？","你有没有在外面突然想过我？哪一次？","你最想让我记住你哪一刻的样子？","你希望我们一晚上几次？","你有没有假装过高潮？为什么？","你最想我在你耳边说哪一句？","你最想问我又不敢开口的是什么？","你有过更过分的幻想吗？到什么程度？","你希望我事前问，还是直接来？","你最喜欢我身上哪一处味道？","一晚上只能一次，你选什么时候？","你最想我夸你哪里？","我做什么的时候你最快到？","如果只能留一个姿势用到老，你选哪个？","你最想我用什么方式开始？","你喜欢我出声吗？什么样的声音？","你有没有试过在很紧张的时候有感觉？","你最想我们尝试什么新花样？","你有没有偷偷买过什么？想用吗？","你希望一晚上几次才够？","你最想我在你身上留下什么？","你最怕我哪个动作？","你最想我说什么？原话。","你最喜欢我什么表情？","你有没有梦到过我们做？内容能说吗？","你觉得我们谁更主动？","你有没有想我想到不行的时候？在哪？","你最想我事后怎么对你？","你最想在哪儿留下我们的痕迹？","你最想我懂你哪种暗示？","你有没有说过反话？哪句？","你最想我哪方面更大胆？","如果只能留一种方式，你选哪个？","你希望我提前做什么准备？","你有没有在洗澡的时候想过我？","你最想我多看你哪里？","你有过很想要但没开口的时候吗？","你最想我事后说什么？","你希望我记住你哪一次的表情？","你最想我做到什么程度才算够？","你最喜欢我在你身上待多久？","你有没有想让我用嘴？想过几次？","你喜欢我强硬一点还是顺着你？","你希望我中途问你吗？","你最想我记住什么？","你最喜欢在床上听我的呼吸吗？","你有没有想被我按住手腕？","你最想要我的什么？","你有没有在洗澡时想我？","你希望我事后说什么？","你最想我哪句话？","你有没有想过去阳台或车里？","你最想我们用多久？","你最喜欢我什么时候的样子？","你有没有想在特别的地方做？说出来。","你最喜欢我什么时候的声音？","你希望我多主动？","你有没有想过被我按住？","你最想我记住你哪个表情？","你有没有在半夜想过我？","你最想我什么速度、什么力度？","你希望我事后说什么、做什么？","你最想我们尝试什么？","你有没有因为一句脏话有反应？","你最想我什么时候出现？","你有没有假装不在意，其实很想要？","你最想我哪一点变大胆？","你有没有想过在外面？","你最想我们多久一次？","你希望我事前问多细？","你最想我说哪句话？","你有没有偷偷看过我换衣服？","你最想我留下什么？","你希望我更强硬还是更温柔？","你有没有想过一直不结束？","你最想要我的什么？","你最喜欢我什么动作？","你有没有说过反话？哪句？","你最想我懂你哪种暗示？","你希望我们怎么开始？"],"w":["你最想我用什么方式让你到？","你最喜欢我进去的时候说什么？","你最喜欢怎么称呼我？","你有没有想过让我用嘴？","你多久一次算正常？想更频繁吗？","你最想我事后帮你清理吗？","除了下面，你还有哪些敏感带？","你最喜欢我用什么姿势？","你希望我多粗暴？说个程度。","你有没有想被绑住过？","你最想我们试什么道具？","你会因为我哪句话立刻有感觉？","你想要我的手指，还是我的舌头？","你希望我做的时候看着你吗？","你想过我们在浴室吗？","你最喜欢我事后吻你哪儿？","你有没有假装不喜欢，其实很想要？","你想要我多快？","你希望我事后抱你多久？","你有没有想过在外面被我摸？","你最想我什么时候停下来？","你有没有一晚上好几次过？想试吗？","你最想我怎么收尾？","你希望我事前问得细一点吗？","你最想我记住你哪个反应？","你有没有想被蒙住眼睛？","你最想听我说哪句脏话？","床上谁说了算？","你希望我多久主动一次？","你最想一晚上试几种？","你有没有什么一直没说出口的？","你最喜欢我什么眼神？","你希望我留下痕迹吗？留哪儿？","你最想我懂你哪种反应？","你最想我用什么方式开始？","你喜欢我进去之后说什么？","你最想我们做到几点？","你有没有想过被绑住？","你最想要几次？","你最喜欢我什么声音？","你最想我事后怎么对你？","你有没有想过在那里？","你最想我穿什么？","你希望我多快？","你最想我记住你哪里？","你有没有想过让我用嘴？","你最想我什么时候停？","你希望我事前准备什么？","你有没有想过换一种方式？","你最想要我的什么？","你希望我留着灯吗？","你有没有想过说出口？","你最想我多强势？","你希望我事后抱你多久？","你有没有想过白天做？","你最想让我的手放在哪？","你最喜欢我什么眼神？","你最想我留下印子吗？","你希望多久一次？","你有没有假装到过？","你最想我说哪句？","你希望谁在上面？","你最想我们怎么收尾？","你有没有想过我们两个一起疯？"]},D={"g":["给我一个 8 秒的拥抱。","帮我捏肩 1 分钟。","牵着我的手转一圈。","和我对视 12 秒，先笑的人输。","唱一句情歌给我听。","模仿我一个习惯动作，让我猜。","把一句情话写在我手心上。","学一种动物叫给我听。","给我一个额头吻。","用三个词形容我，边说边比划。","学我说话的语气说一句话。","试着抱起我（量力而行）。","把我的手指一根一根握一遍。","从背后蒙住我的眼睛 4 秒。","用鼻子蹭我的脸。","帮我倒杯水，双手递给我。","站我身后帮我按头 12 秒。","学我笑的样子。","对我做一个鬼脸。","摸摸我的头。","握住我的手，数到十再松开。","帮我理一下头发。","摸一下我的耳朵，再说一句夸我的话。","给我一个晚安抱。","给我一个额头吻，然后说一句晚安。","用40 秒帮我捶背。","牵起我的手，说一句最想说的话。","对着镜子夸我一句。","学我一句口头禅。","在我手背上写一个数字，让我猜。","用鼻子轻轻碰一下我的鼻子。","给我梳一下头发，用手也行。","帮我剥一颗糖，喂我吃。","站到我旁边，肩并肩 8 秒。","用我的名字写一句话，念出来。","和我击掌三次。","抱我 4 秒，然后放开。","学我笑的样子，逗我笑。","帮我整理一下衣角。","用手指在我手心画一个字母，让我猜。","给我倒一杯水，说一句关心的话。","对着我做一个爱心手势。","用你手机里我的一张照片当锁屏，给我看。","给我写一句 20 字以内的情书，念出来。","帮我揉 12 秒太阳穴。","牵我的手放你脸上贴 4 秒。","学一遍我第一次跟你说话时的语气。","把我抱起来离地 3 秒。","用三个字形容我们的关系，然后解释。","在我掌心写你名字最后一个字。","给我一个最不好意思但最真心的拥抱。","背我走三步。","用手指在我后背写三个字，让我猜。","帮我系一次鞋带。","把头靠在我肩上，说一句平时不会说的话。","对着我笑 8 秒，不许停。","用你的外套把我裹起来 4 秒。","给我捶背 20 下。"],"h":["隔着一张纸亲我一下。","额头相贴 8 秒，不许说话。","在我耳边说一句悄悄话。","牵手 1 分钟，中途不许松开。","用指尖在我手心写字，让我猜。","壁咚我 4 秒。","抱着我转一圈。","从背后抱住我 12 秒。","说出一个你想和我一起实现的小愿望。","靠在我肩上 12 秒，不许动。","用最温柔的声音连叫我的名字三遍。","亲我的手背一下。","在我耳边慢慢数到十。","说一句你从没对我说过的情话。","让我闭眼，你从我身后抱住我。","用鼻尖碰我的鼻尖，坚持 8 秒。","说出我们最近一次心动的瞬间。","说出你最想和我一起过的节日，并描述怎么过。","让我随便说一个数字，你用那个字数夸我。","抱住我说一句：有你在真好。","用嘴唇碰一下我的掌心。","用三种语气各说一次我喜欢你。","亲我脸颊一下，然后告诉我为什么。","把我的一只手放进你外套口袋里 12 秒。"],"b":["轻轻亲一下我的脖子。","压低声线，在我耳边说一句情话。","把我的手放在你心跳的位置，让我感受。","和我对视 12 秒，然后主动亲我。","说出你最想被吻的地方，然后实现一次。","我闭眼，你在我手心写：我爱你。","用最认真的表情，对我表白一次。","给我一个 12 秒的拥抱，中途不许说话。","把你理想中的浪漫夜晚描述得具体一点。","让我在你额头、脸颊、嘴唇里选一个，你亲下去。","说出对我的三个非分之想，可以含蓄一点。","在我耳边低语我的名字，然后说一句只有我们懂的话。","用一个吻结束这一轮。","让我闭上眼，你用一个动作表达喜欢。","说出你最想和我一起完成的第一次。","抱着我，说一句你想说很久的话。","亲我的指尖，每根手指一次。","让我靠在你肩上，说 12 秒心里话。","说出你最喜欢我哪一点，然后自己想办法证明。","专注看我 8 秒，然后告诉我你看到了什么。"],"x":["用嘴解开我一颗扣子。","手伸进我衣服里，抱着我 12 秒。","在我脖子上轻轻咬一下。","坐到我腿上，30 秒不许动。","吻我 8 秒。","用嘴唇在我手背上写一个字。","拉住我的手，放到你腰上。","用鼻子蹭我的脖子。","把我抵在墙上 4 秒。","从背后抱住我，下巴放我肩上 12 秒。","亲我的耳垂。","解开我外套拉链，再拉上。","用指尖从我脸颊滑到锁骨。","让我闭眼，你亲我一下，让我猜亲了哪儿。","抱我转一圈再放下。","额头抵着我的额头 8 秒。","慢慢帮我整理领口。","在我手心画一颗心。","用手背贴一下我的脸，停 4 秒。","把我的一缕头发别到耳后。","单手撑墙看我 4 秒。","在我耳边轻轻哼一句歌。","握住我的手腕 8 秒不放。","用指尖点一下我的鼻尖。","从背后环住我的腰。","坐在我旁边，把头靠在我肩上。","拉起我的手亲一下手背。","用嘴唇碰一下我的额头。","把外套脱下来披在我身上。","慢慢靠近我，停在离我 3 厘米的地方。","用手指描一遍我的眉毛。","捧着我的脸看 4 秒。","替我系一下衣领。","轻轻捏一下我的脸。","把我的手拉到你腰上，贴着不动 8 秒。","在我耳边用气声数到五。","从背后抱住我，把下巴搁在我肩上。","用嘴唇碰一下我的耳廓。","把我按在门上 3 秒。","拉我坐下，坐在我旁边靠着我。","帮我解开一颗扣子，又扣回去。","用鼻子蹭我的耳后。","握我的手，十指扣紧 8 秒。","在我耳边说一句最想说的软话。","用指尖描我的锁骨。","让我闭上眼，你绕到我身后。","把额头抵在我后颈 4 秒。","捧着我的脸，慢慢靠近。","在我手心写一个词，让我念出来。","拉着我的手放到你心口，说一句。","用嘴唇轻轻碰我的下巴。","坐在我对面，偷偷踩一下我的脚。","帮我别好头发，动作慢一点。","在我耳边说：今晚多看我一会。"],"z":["把手伸进我衣服里，摸着我说一句你想说的话。","吻我，手不许老实。","在我大腿内侧落一个吻。","咬住我的耳垂，说一句脏话。","把我压在身下 8 秒，再放开。","亲我，直到我喘不过气。","拉过我的手，放到你想放的地方。","用嘴唇从我的手腕一路移到锁骨。","在我耳边用气声叫我的名字。","解开我两颗扣子，然后停手。","抱住我，在我耳边说：今晚别让我睡。","双手撑墙，把我圈在中间。","在我腰侧亲一下。","让我坐着，你蹲下来看我 8 秒。","用牙齿轻轻咬住我一根手指。","拉我坐到你的腿上，额头贴额头。","摸我的头发，亲一下我的发顶。","把我的手放到你心口的位置。","咬一下我的肩膀。","用嘴唇碰一下我的锁骨。","拉过我的手放在你腿上。","在我耳边说一句最直接的。","拉我靠近，额头贴额头 8 秒。","用指尖从我的腰侧滑下去。","把我圈在你和墙之间。","亲一下我的下巴。","用牙齿轻轻咬住我的袖子。","让我坐下，你坐在我腿上。","低头亲一下我的肩。","拉起我的手亲一下手心。","从背后抱住我，贴紧 8 秒。","把我的手按在你腰上。","用嘴唇贴着我的耳朵说话。","在我脖颈上轻轻吹一口气。","用手从我的脖颈摸到后背。","在我耳边说一句你一直想说的。","把我拉进怀里，贴紧 8 秒。","吻我的脖子侧面。","让我闭眼，你带我的手去一个地方。","坐到我腿上，抱住我。","用指尖碰一下我的嘴唇。","从背后吻我的肩。","把我的手放在你心口。","在我耳边说出你现在的想法。","慢慢解开我一颗扣子。","额头抵着我的额头，说一句最想说的。","用嘴唇从我的肩滑到手腕。","把我抵在墙边，看着我 4 秒。","用牙齿轻轻咬一下我的耳垂。","拉我的手放在你腰侧。","在我耳边说一句最直接的。","从背后环住我，贴紧 8 秒。","用指尖点一下我的颈侧。","亲一下我的锁骨。","让我坐好，你蹲下来看我。","把我的手指含进嘴里一下。","用额头抵着我的额头说一句话。","拉我坐到你腿上，抱住。","用嘴唇贴着我耳边说话。","帮我解开外套，披在我肩上。","在我腰侧轻轻掐一下。","用手指从我的后颈滑下去。","亲一下我的手心。","把我的手放到你腿上。","用气声叫我的名字。","让我看着你，说一句真心话。","抱住我转一圈。","在我脖子上吹一口气。"],"w":["解开我全部扣子，然后看着我。","用嘴唇从我的锁骨一路往下到腰。","拉我的手，按在你最想要的位置。","在我耳边说出你想让我做的全过程。","跨坐到我腿上，自己动 12 秒。","含住我一根手指，看着我。","把我推倒在床上，压 8 秒，再退开。","在我大腿内侧用舌尖写一个字母。","吻我，同时把手伸进我衣服里。","解开我的裤腰，然后停手。","在我耳边用气声说：我想要你。","抓住我的手腕，按过头顶 4 秒。","从背后贴紧我，保持 8 秒。","用牙齿拉开我的领口。","让我站好，你蹲下来看我 8 秒。","用腿钩住我的腰。","在我脖子上留下一个印子。","说一句你从没说过的最露骨的话。","用指尖沿着我的脊背滑下去。","拉我坐到你身上，额头贴着我 8 秒。","亲我，然后退开，说：还想。","把我的衣服往上推，停在那儿。","在我耳边数到三，然后说出你想做什么。","用最直接的方式碰我一下，再收手。","贴着我的耳朵说：今晚别想睡。","让我选：让我吻你，还是听你的。","把我的一条腿抬起来，圈住你。","吻我，直到我忍不住。","解开我全部扣子，但不要碰。","用嘴唇沿着我的腰线走。","拉我的手，按在你最想要的位置。","在我耳边说出你最想做的三件事。","跨坐到我腿上，看着我 8 秒。","含住我的手指，看着我。","把我推倒，压住 8 秒再退开。","在我大腿内侧写一个字。","吻我的脖子，留下一点痕迹。","把我的衣服推到胸口，停住。","在我耳边用气声说一句脏话。","抓住我的手腕，按过头顶。","从背后贴上来，抱着我的腰。","用腿勾住我。","让我闭眼，你做一件事。","亲我，手别停。","让我选一个你最想被碰的地方。","贴着我的耳朵说：我忍不了了。","用指尖沿着我的脊柱往下。","让我坐着，你跪在我面前。","解开我的裤腰，然后看我。","拉我坐到你身上，额头贴着。","在我耳边数到三。","用最直接的方式碰我一下。","咬着我的肩说一句话。","吻我，直到我推开你。"]},O={"x":["跪坐在我面前，看着我，等我开口。","用最恭敬的语气叫我一声，然后等我说可以起来。","把手背到身后站好，让我检查你三秒。","说三遍我听你的，一遍比一遍轻。","趴在我腿上，30 秒不许动。","用嘴帮我脱掉一只袜子，放好。","跪着给我捶腿40 秒。","向我报告你今天最想做的一件事，说完问我准不准。"],"z":["跪好，抬头看我，说请命令我。","双手举过头顶，跪 20 秒，我不同意不许动。","跪下，用嘴解开我的鞋带，再系好。","趴下，让我用脚踩在你背上 8 秒。","跪在我脚边，说出你最羞的一件事，不许省略。","站着别动，让我一件一件解开你，全程不许碰我。","跪着，用最直白的语言求我做一件事。","把我的一只脚放在你膝盖上，替我按40 秒。","趴跪着，让我在你后颈写一句话。","跪好，双手合十，说三遍我服从，一遍比一遍小声。"],"w":["跪好，解开我的裤腰，然后用嘴，我不叫停就不许停。","跪在我两腿之间，抬头看我，等我说开始。","把双手绑到身后，跪 40 秒。","跪着把自己脱到只剩一件，叠好放我脚边。","趴下，把腰抬高，等我 12 秒。","跪好，含住我的手指，我说停才停。","跪下求我碰你一次，说清楚想被碰哪里。","让我把你按在床上，脸朝下，保持 20 秒。","跪着，用最脏的话描述你想我做什么。","把眼睛蒙上，跪着等我40 秒，不许出声。","跪好，让我在你身上留一个印子，位置我定。","跪下，说出你今晚最想被怎么用，说完求我。"]},PU={"x":["给对方按肩 3 分钟。","去做一件对方指定的家务。","被对方捏脸 8 秒不许躲。","说三句夸对方的话，一句比一句真。"],"z":["跪坐 20 秒不许说话。","被对方拍一张你不敢看的照片，可以删。","听对方指挥做三个动作。","说一句最羞的真心话。"],"w":["跪满 40 秒。","被对方绑住手 20 秒。","按对方说的做一件事，不许讨价还价。","说出一个你最想被做的幻想，说完不许脸红。"]},C={"x":[{"n":"旧情人","s":"假装在同学会遇到旧情人，你要当着我的面把我带走。"},{"n":"陌生人","s":"假装在酒吧第一次搭讪，你要在两分钟内把我带回家。"},{"n":"服务生","s":"你是我点的私人服务生，跪着给我倒一杯酒，再说一句暗示。"},{"n":"老师","s":"你是我的老师，我迟到了，你罚我，罚什么你定。"}],"z":[{"n":"训导","s":"你是训导者，我做错了一件事。你罚我跪下，问我错在哪，直到你满意。"},{"n":"审问","s":"你审问我，用任何方式让我说出一个秘密，我撑不住了就认输。"},{"n":"医生","s":"你是医生，要检查我的身体，一步步告诉我你要检查哪里。"},{"n":"主人","s":"你是主人，我只是你的所有物，20 分钟内你说什么我都做。"},{"n":"按摩师","s":"你是我预约的按摩师，要让我放松到忍不住，全程你说了算。"}],"w":[{"n":"惩罚","s":"我犯错被送到你面前，你决定怎么罚我，然后执行，全程我只许说是。"},{"n":"调教","s":"你调教我，定三条规矩，违反一条罚一次，我会试着守。"},{"n":"求","s":"我跪在你面前求你，你要一直不答应，直到我说出那句最羞的话。"},{"n":"眼罩","s":"给我戴上眼罩，然后你想做什么就做什么，六分钟。"},{"n":"契约","s":"签一个只今晚有效的契约：我完全听你的，你可以随时叫停或加码。"},{"n":"交换","s":"你当15 分钟的主导者，我当服从者，之后互换，谁先求饶谁输。"}]};
+var MODES={truth:"真心话",dare:"大冒险",order:"命令",scene:"剧本"};
+var LVN={x:"温柔",z:"亲密",w:"热烈"};
+var S={p1:"宝贝",p2:"宝贝",mode:"truth",lvl:"z",turn:0,i:0,deck:[],score:[0,0],ok:0,skip:0};
+var $=function(s){return document.querySelector(s)};
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.random()*(i+1)|0;var t=a[i];a[i]=a[j];a[j]=t}return a}
+function pick(a,n){var r=[],k=0;while(r.length<n&&a.length&&k<20){r=r.concat(shuffle(a));k++}return r.slice(0,n)}
+function show(id){var xs=document.querySelectorAll(".screen");for(var i=0;i<xs.length;i++)xs[i].classList.toggle("show",xs[i].id===id)}
+function planOf(mode,lvl){
+ if(mode==="dare")return {x:[["x",8],["z",22]],z:[["z",8],["w",22]],w:[["w",30]]}[lvl];
+ if(mode==="scene")return [[lvl,8]];
+ if(mode==="order")return {x:[["x",8],["z",10]],z:[["z",10],["w",12]],w:[["w",18]]}[lvl];
+ return {x:[["x",8],["z",22]],z:[["z",8],["w",22]],w:[["w",30]]}[lvl];
+}
+function build(){
+ var plan=planOf(S.mode,S.lvl),pool=[],pi,i,lv,n,p;
+ for(pi=0;pi<plan.length;pi++){lv=plan[pi][0];n=plan[pi][1];p=[];
+  if(S.mode==="truth"){
+   for(i=0;i<T[lv].length;i++)p.push({k:"t",q:T[lv][i],lv:lv});
+  }else if(S.mode==="dare"){
+   for(i=0;i<D[lv].length;i++)p.push({k:"d",q:D[lv][i],lv:lv});
+   for(i=0;i<O[lv].length;i++)p.push({k:"o",q:O[lv][i],lv:lv,p:PU[lv][i%PU[lv].length]});
+  }else if(S.mode==="order"){
+   for(i=0;i<O[lv].length;i++)p.push({k:"o",q:O[lv][i],lv:lv,p:PU[lv][i%PU[lv].length]});
+  }else{
+   for(i=0;i<C[lv].length;i++)p.push({k:"c",q:C[lv][i].s,lv:lv,n:C[lv][i].n});
+  }
+  pool=pool.concat(pick(shuffle(p),n));
+ }
+ S.deck=pool;S.i=0;S.score=[0,0];S.ok=0;S.skip=0;S.turn=0;
+}
+function render(){
+ var c=S.deck[S.i],tg=$("#tag");
+ document.querySelector(".wrap").setAttribute("data-t",S.turn?"1":"0");
+ var _tb=$("#turnbar");$("#tname").textContent=S.turn?S.p2:S.p1;
+ $("#trole").textContent=S.mode==="order"?(S.turn===0?"下令":"执行"):S.mode==="scene"?"一起演":"读卡";
+ _tb.classList.remove("flash");void _tb.offsetWidth;_tb.classList.add("flash");
+ $("#modeName").textContent=MODES[S.mode];
+ $("#stage").textContent="";
+ $("#cnt").textContent=(S.i+1)+" / "+S.deck.length;
+ $("#prog").style.width=(S.i/S.deck.length*100)+"%";
+ tg.className="tag"+(c.k==="d"||c.k==="o"?" dare":"")+(c.k==="c"?" scene":"");
+ tg.textContent=c.k==="t"?("真心话 · "+LVN[c.lv]):c.k==="d"?("大冒险 · "+LVN[c.lv]):c.k==="o"?("命令 · "+LVN[c.lv]):("剧本 · "+c.n);
+ $("#q").textContent=c.q;
+ var eb=$("#extra");
+ if(c.k==="c"){eb.className="extra scene";eb.textContent="演 1-2 分钟，然后换人。";eb.style.display="block";}
+ else {eb.className="extra";eb.style.display="none";}
+ var pw=$("#penwrap");
+ if(c.p){$("#ptag").textContent=(c.k==="o"?"拒绝惩罚":"跳过惩罚");$("#ptx").textContent=c.p;$("#pnm").textContent="待执行 · 完成惩罚后才结算";pw.className="penwrap on";}
+ else {pw.className="penwrap";}
+ if(S.mode==="order"){var c1=S.turn===0?S.p1:S.p2,c2=S.turn===0?S.p2:S.p1;$("#who").textContent=c1+" 下令 · "+c2+" 执行";}
+ else if(S.mode==="scene")$("#who").textContent="两个人一起演";
+ else $("#who").textContent="轮到 "+(S.turn===0?S.p1:S.p2);
+ $("#sc1").textContent=S.p1+" "+S.score[0];$("#sc2").textContent=S.score[1]+" "+S.p2;
+ $("#sc1").className=S.turn===0?"on":"";$("#sc2").className=S.turn===1?"on":"";
+ $("#ok").textContent=S.mode==="order"?"执行了":"完成";
+ $("#no").textContent=S.mode==="order"?"拒绝（罚）":"跳过";
+ setPen(0);
+ var card=$("#card");card.classList.remove("pop");void card.offsetWidth;card.classList.add("pop");
+}
+function toast(t,kind){var e=$("#toast");e.className="toast"+(kind?" "+kind:"");e.textContent=t;clearTimeout(window.__tt);window.__tt=setTimeout(function(){e.className="toast"},kind==="pen"?4600:2400)}
+function nextTurn(){
+ S.i++;S.turn=1-S.turn;
+ if(S.i>=S.deck.length){finish();return}
+ 
+ render();
+}
+function gate(k){$("#gtitle").textContent="第 "+k+" 关，通过";show("gate")}
+function finish(){
+ var t=S.ok+S.skip;
+ $("#verdict").textContent=t>=S.deck.length-2?"全做完了。今晚你们两个，都很敢。":t>=S.deck.length/2?"过半了，状态还在往上走。":"刚开始就停了，下次别这么客气。";
+ $("#stats").textContent="共 "+S.deck.length+" 张 · 完成 "+S.ok+" · 跳过 "+S.skip+" | "+S.p1+" "+S.score[0]+" : "+S.score[1]+" "+S.p2;
+ show("end");
+}
+$("#ok").onclick=function(){S.ok++;S.score[S.turn]++;nextTurn()};
+$("#no").onclick=function(){
+ var c=S.deck[S.i];
+ if(c.p){startPen();return}
+ S.skip++;nextTurn();
+};
+$("#penok").onclick=function(){S.skip++;S.pencnt=(S.pencnt||0)+1;toast("惩罚已完成，本张结算","pen");nextTurn();};
+function startPen(){S.pen=1;var pw=$("#penwrap");pw.className="penwrap on act";$("#pnm").textContent="执行中 · 做完点下面的「完成惩罚」";setPen(1);var c=S.deck[S.i];toast("接受惩罚 · "+c.p,"pen")}
+function setPen(v){$("#penrow").style.display=v?"flex":"none";$("#btnsmain").style.display=v?"none":"flex"}
+$("#gbtn").onclick=function(){show("play");render()};
+$("#again").onclick=function(){build();show("play");render()};
+function seg(el,key){el.addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;
+ var bs=el.querySelectorAll("button");for(var i=0;i<bs.length;i++)bs[i].classList.toggle("on",bs[i].getAttribute("data-v")===b.getAttribute("data-v"));
+ S[key]=b.getAttribute("data-v")})}
+seg($("#mode"),"mode");seg($("#lvl"),"lvl");
+$("#start").onclick=function(){
+ S.p1=(($("#n1").value||"").trim()||"宝贝").slice(0,8);
+ S.p2=(($("#n2").value||"").trim()||"宝贝").slice(0,8);
+ build();show("play");render();
+};
+
+(function(){
+ var A=function(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.random()*(i+1)|0;var t=a[i];a[i]=a[j];a[j]=t}return a};
+ var take=function(a,n){return A(a).slice(0,n)};
+ build=function(){
+  var plan=planOf(S.mode,S.lvl),pool=[],pi,i,lv,n,p,seen=S.seen||{};
+  for(pi=0;pi<plan.length;pi++){
+   lv=plan[pi][0];n=plan[pi][1];p=[];
+   if(S.mode==="truth"){
+    for(i=0;i<T[lv].length;i++)p.push({k:"t",q:T[lv][i],lv:lv});
+   }else if(S.mode==="dare"){
+    for(i=0;i<D[lv].length;i++)p.push({k:"d",q:D[lv][i],lv:lv});
+    for(i=0;i<O[lv].length;i++)p.push({k:"o",q:O[lv][i],lv:lv});
+   }else if(S.mode==="order"){
+    for(i=0;i<O[lv].length;i++)p.push({k:"o",q:O[lv][i],lv:lv});
+   }else{
+    for(i=0;i<C[lv].length;i++)p.push({k:"c",q:C[lv][i].s,lv:lv,n:C[lv][i].n});
+   }
+   var fresh=p.filter(function(x){return !seen[lv+"|"+x.q]});
+   var got=take(fresh.length>=n?fresh:p,n);
+   for(i=0;i<got.length;i++){if(got[i].k!=="c")got[i].p=got[i].p||PU[lv][i%PU[lv].length];seen[lv+"|"+got[i].q]=1}
+   pool=pool.concat(got);
+  }
+  S.seen=seen;S.deck=pool;S.i=0;S.score=[0,0];S.ok=0;S.skip=0;S.turn=0;
+ };
+ S.seen={};
+})();
+T.g=T.g.concat(["你觉得我身上哪个小毛病最可爱？","如果只能带走我一样东西，你带什么？","你最想在什么季节和我去哪里？","你有没有偷偷记下我说过的话？哪句？","你觉得我们最像哪部电影里的情侣？","你最想我学会做什么？","你有没有为我吃过醋？什么时候？","你最想我们一起养点什么？","你觉得我做哪件事的时候最迷人？","你最想和我一起熬夜做什么？","你有没有想过我们的十年后？","你最想收到我送的什么礼物？"]);T.x=T.x.concat(["你最想在什么声音里和我亲密？","你更喜欢我亲你还是我咬你？","你最想我穿什么颜色？","你希望我事前先洗澡吗？","你最想被我摸哪里？","你有没有偷偷闻过我的衣服？","你觉得我哪种表情最让你受不了？","你最想我们多久一次？","你希望我说停就停，还是我说再久一点？","你最想我事后抱你多久？","你有没有梦到过我？梦到什么？","你最想让我们的第一次发生在哪里？","你最喜欢我什么声音？","你希望我主动还是你主动？","你有没有因为想我而分心？当时在干嘛？","你最想我记住你哪个瞬间？"]);T.z=T.z.concat(["你最喜欢我什么时候的样子？","你最想让我在什么场合下叫你？","你有没有想过在浴室？","你最想被我用什么速度？","你希望我戴，还是不戴？","你最想我留在你身上什么痕迹？","你有没有偷偷录过我的声音？","你最想我事后说什么？","你最喜欢我哪里最敏感？","你希望我多用力？","你想过被别人听到吗？会是什么反应？","你最想我多久一次？","你有没有在洗澡时想过我？","你最喜欢我什么味道？","你希望我关灯还是开灯？","你最想我答应你哪件事？","你有没有想过角色扮演？演谁？","你最想我用哪种方式结束？"]);T.w=T.w.concat(["你最想我跪下来对你说什么？","你希望我服从到什么程度？","你最想我用什么称呼叫你？","你有没有想过被我绑起来？绑哪里？","你最想我在你第几次求饶时才停？","你最想我身上留下什么？","你希望我疼还是痒？","你最想我答应你哪件过分的事？","你有没有想过让我在门外等？等多久？","你最想我什么时候说不行？","你希望我穿什么来见你？","你最想我记住你哪句命令？","你有没有想过我求你？怎么求？","你最想被我怎样开始？","你希望我听话还是反抗？","你最想我事后被怎么对待？","你有没有想过被蒙眼？","你最想我为你破例哪条规矩？","你希望我说多少句脏话？","你最想看到我哪一刻失控？"]);
+D.g=D.g.concat(["用手指在我掌心写三个字，让我猜。","把我的手放在你脸上，停 8 秒。","学我走路的样子走三步。","给我一个背后拥抱，20 秒。","闭眼，让我亲你一下任意位置。","用额头碰我的额头，说一句晚安。","牵着我的手，说一句你平时不说的肉麻话。","帮我把鞋带系一下（假装也行）。","给我念一句你手机备忘录里的东西。","把我的一缕头发绕在手指上，停 4 秒。"]);D.x=D.x.concat(["在我耳边用气声说三个字。","亲我的锁骨一下。","把我的手指含在嘴里 3 秒。","让我坐在你腿上，你的手环住我的腰。","解开我的皮带扣，再扣回去。","亲我，中途停下来看我 3 秒。","用嘴唇碰一下我的喉结。","把手放在我后颈，慢慢捏。","从我背后亲我的肩膀。","你的手从我膝盖一路滑到腰。","说一句你最想做的，然后先做十分之一。","让我躺下，你从我上方撑住看我 8 秒。"]);D.z=D.z.concat(["亲我，手放到我腰上，不许离开。","用牙齿轻轻拉我的衣领。","让我靠着墙，你贴上来 8 秒。","亲我的耳朵，说一句让我脸红的话。","你的手放在我大腿上，停 4 秒。","把我的一只手按住，另一只手摸我的脸。","跪在我面前，抬头看我 8 秒。","在我耳边数到五，每数一下亲我一下。","把我的衣服下摆拉起来一点，看一眼再放下。","用嘴唇描我的下巴。","抱住我，说：今晚听我的。","让我转过身，从背后抱住我。","亲我的后颈。","抓住我的手腕，看着我，说一句命令。"]);D.w=D.w.concat(["跪好，抬头，等我 8 秒。","把双手背到身后，站 12 秒。","爬到我脚边，说一句请。","让我坐着，你在我面前停下，不许碰我。","脱下外套，放在我手里。","叫我一声，我让你停你才能停。","跪下，把额头贴在我膝盖上 12 秒。","用手捧住我的脸，说：我是你的。","让我检查你今天乖不乖。","跪着把我的手拉到你头上。","被我按住不能动，数到十。","用最低的声音重复一遍我说的话。","把眼睛闭上，等我亲你。","向我报备一件你今天瞒着我的事。","跪着解开我的鞋带。","在我面前转一圈，然后停下等我命令。"]);
+
+O.x=O.x.concat(["用手托起我的下巴，说：看着我。","命令我坐到你腿上，然后自己闭上眼。","用一根手指按住我的嘴唇，让我别说话。","让我把手放在你胸口，感受你的心跳。","命令我吻你，然后中途推开我。","让我把耳朵贴到你嘴边，你只许用气声说话。"]);O.z=O.z.concat(["命令我跪在你面前，抬头，直到你说可以。","把我的手绑在身后，让我跪着等你。","命令我数你的手指，每数一根亲一下。","让我趴下，你用手掌按在我后背上 10 秒。","命令我把你的鞋脱了，然后亲一下你的脚背。","让我靠墙站好，你的手按在我肩上，不许我动。","命令我说出三件你最想让我做的事，然后挑一件执行。","让我闭上眼睛，用嘴找到你的手。"]);O.w=O.w.concat(["命令我跪好，双手放在膝盖上，等你发话才能动。","把眼罩给我戴上，命令我站起来走三步再走回来。","命令我用嘴解开你的衬衫最上面两颗扣子。","让我跪着，命令我给你捶腿 30 秒，再用嘴停一下。","命令我趴在你腿上，自己数到二十。","让我把双手举过头顶，你慢慢解开我的衣服，只解到一半。","命令我求你，说出你指定的那句话，我才可以碰你。","让我跪着转过身，把后背交给你。","命令我用最低的声音说三遍：我听话。","让我躺下，双手放在头顶，你决定什么时候开始。"]);
+C.x=C.x.concat([{"s":"我下班回来，你把拖鞋放好，跪下来帮我换鞋，然后抬头等我夸你。","n":"接驾"},{"s":"你在沙发上等我，我进门后你只说一句请坐，然后按我的指示做，全程不许主动。","n":"等门"},{"s":"我假装生气不理你，你要用一个动作和一句话让我开口。","n":"哄"}]);C.z=C.z.concat([{"s":"我把你的眼睛蒙上，牵着你在房间里走一圈，然后把你按在墙上，用气声告诉你接下来会发生什么。","n":"盲行"},{"s":"你跪在我面前，我一件一件说出你今天的三个错，每说一个你就要认一次，最后接受惩罚。","n":"审讯"},{"s":"我们互换身份六分钟，你演我，我演你，谁先出戏谁被罚。","n":"互换"}]);C.w=C.w.concat([{"s":"你戴上眼罩跪好，我开始定规矩：不许出声、不许动、我问才许答，破一条罚一次。","n":"规矩"},{"s":"我被你命令跪着等你回来，你进门后先不看我，绕我走一圈，再决定让我做什么。","n":"等待"},{"s":"你扮演主人，我扮演不听话的人，你用三句话让我跪好，然后当着我的面说出今晚的安排。","n":"驯服"}]);
+
+PU.x=PU.x.concat(["跪着数到三十","被对方用手指弹三下额头","大声说三遍：我该罚","让对方在你手心写一个字，猜错再罚一次"]);
+PU.z=PU.z.concat(["被按住不许动 20 秒","跪着说三次：请罚我","让对方在你身上挑一个地方，亲十秒","接下来三张卡都不许拒绝"]);
+PU.w=PU.w.concat(["跪满 40 秒","被绑住手 30 秒","说出你最想被做的一件事，然后自己重复一遍","对方的任意一个命令，必须照做"]);
+
+(function(){
+var LVS=["g","x","z","w"];
+var DM=["。做完看我一眼。","。做完告诉我什么感觉。","。做完亲我一下。"],CM=["。慢慢做。","。做完说一声好了。","。做完再重复一遍。","。做完亲我一下。","。做完看我一眼。","。做完抱我一下。","。做完告诉我什么感觉。","。中间可以停一次。","。做完问我满不满意。"],SM=["。限时 2 分钟。","。演之前先说一句：我准备好了。","。演完说出你刚才最想做的事。","。笑场就重来一次。","。全程小声说话。","。演完亲我一下再退场。","。中间停下来看我一眼。","。演完抱我一下。","。最后一句台词你自己编。","。演完让我牵你起来。","。结束时保持最后一个动作 20 秒。","。演完说一句：我演完了。"];
+var SCRUB=/绑|眼罩|蒙眼|皮带|围巾|绳|手铐|蜡烛|冰块|羽毛|道具|跳蛋/;
+var FIX=[["把我的手指含进嘴里一下。","把我的手指含在嘴里。"],["你最想我多看你哪里？","你最想被我看哪里？"],["你希望我做的时候看着你吗？","你希望我在做的时候看着你吗？"],["你最想我懂你哪种反应？","你最想我注意到你的什么反应？"],["你希望我疼还是痒？","你希望我更重还是更轻？"],["你最想我多强势？","你希望我更强势一点吗？"],["如果只能留一种方式，你选哪个？","如果只能留一种方式，你选哪一种？"]];
+var fix=function(q){for(var i=0;i<FIX.length;i++)q=q.split(FIX[i][0]).join(FIX[i][1]);return q.replace(/(^|[，。])命令我/g,"$1")};
+var scr=function(a){return a?a.filter(function(q){return !SCRUB.test(q)}).map(fix):a};
+T.g=T.g.concat(["你最想我今晚怎么开始？","你希望我先说点什么再动手？","你最想我在这个房间里怎么叫你？","你有没有想过今晚一夜不睡？","你最想我们今晚试几次？","你希望灯开着还是关着？","你最想我今晚穿什么？","你希望我今晚主动到什么程度？","你最想我为了你打破哪条底线？","你希望我跪着等你多久？","你最想我用什么语气命令你？","你有没有想过我因为吃醋而惩罚你？","你最想我在你身上留什么记号？","你希望我检查你到什么程度？","你最想我什么时候松口？","你最想我怎么夸你听话？","你希望我把你摆成什么姿势？","你最想我什么时候说停下？","你有没有想过我写一份规矩给你？","你希望我今晚多主动？"]);D.w=D.w.concat(["跪好，双手放在膝盖上，抬头看我 20 秒。","把眼睛闭上，我用手指点你一个地方，你要猜是哪里。","在我面前跪下，说：今晚我全听你的。","用手把我的手腕抓住，按在桌上 10 秒。","跪着，用嘴把我的裤脚整理好。","让我坐好，你跪在我两腿之间，抬头等我指示。","背诵三遍：不许反抗。","伸出手，让我打一下手心，然后说谢谢。","趴下，双手放在身前，我数到二十你才能起来。","跪下，把额头贴在我手背上 20 秒。","转过身，把后背交给我，不许回头。","跪好，说出你今天最想被我做的一件事。","让我坐好，你跪在我腿边，等我说开始。","把我的手放在你肩上，看着我 20 秒。","在我面前站好，慢慢把外套脱下，然后递给我。","走过来，把额头贴在我额头上，说：今晚我是你的。","跪在床边，等我说可以你才能起来。","把我抱起来放到床上，然后退回一步站好。","帮我把鞋脱了，然后跪着等我下一步。","坐到我身边，手放在我腿上，等我开口。"]);
+for(var k=0;k<LVS.length;k++){var lv=LVS[k];T[lv]=scr(T[lv]);D[lv]=scr(D[lv]);if(O[lv])O[lv]=scr(O[lv]);if(PU[lv])PU[lv]=scr(PU[lv]);if(C[lv])C[lv]=C[lv].filter(function(c){return !SCRUB.test(c.s)}).map(function(c){return {s:fix(c.s),n:c.n}})}
+var BMAP={};
+var xp=function(a,m){var o=[];for(var i=0;i<a.length;i++){BMAP[a[i]]=a[i];o.push(a[i]);for(var j=0;j<m.length;j++){var v=a[i]+m[j];BMAP[v]=a[i];o.push(v)}}return o};
+for(var k2=0;k2<LVS.length;k2++){var lv2=LVS[k2];D[lv2]=xp(D[lv2],DM);if(O[lv2])O[lv2]=xp(O[lv2],CM);if(C[lv2]){var cc=[];for(var i2=0;i2<C[lv2].length;i2++){cc.push(C[lv2][i2]);for(var j2=0;j2<SM.length;j2++)cc.push({s:C[lv2][i2].s+SM[j2],n:C[lv2][i2].n})}C[lv2]=cc}}
+window.BMAP=BMAP;S.seen={};
+build=function(){
+ var plan=planOf(S.mode,S.lvl)||planOf(S.mode,"z"),pool=[],pi,i,lv,n,p,seen=S.seen||{};
+ for(pi=0;pi<plan.length;pi++){lv=plan[pi][0];n=plan[pi][1];p=[];
+  if(S.mode==="truth"){for(i=0;i<T[lv].length;i++)p.push({k:"t",q:T[lv][i],lv:lv})}
+  else if(S.mode==="dare"){for(i=0;i<D[lv].length;i++)p.push({k:"d",q:D[lv][i],lv:lv});for(i=0;i<O[lv].length;i++)p.push({k:"o",q:O[lv][i],lv:lv})}
+  else if(S.mode==="order"){for(i=0;i<O[lv].length;i++)p.push({k:"o",q:O[lv][i],lv:lv})}
+  else{for(i=0;i<C[lv].length;i++)p.push({k:"c",q:C[lv][i].s,lv:lv,n:C[lv][i].n})}
+  var pre=S.mode+"|";
+  var pick1=function(src){var mp={},ks=[],i,x,b;for(i=0;i<src.length;i++){x=src[i];if(seen[pre+x.q])continue;b=BMAP[x.q]||x.q;if(!mp[b]){mp[b]=[];ks.push(b)}mp[b].push(x)}var out=[];for(i=0;i<ks.length;i++){var a=mp[ks[i]];out.push(a[Math.floor(Math.random()*a.length)])}return out};
+  var fresh=pick1(p);
+  if(fresh.length<n&&p.length>=n){for(var kk in seen){if(kk.indexOf(pre)===0)delete seen[kk]}fresh=pick1(p)}
+  fresh=fresh.sort(function(){return Math.random()-0.5}).slice(0,n);
+  for(i=0;i<fresh.length;i++){if(fresh[i].k!=="c"){var pu=PU[lv]&&PU[lv].length?PU[lv]:[];if(pu.length)fresh[i].p=fresh[i].p||pu[i%pu.length]}seen[pre+fresh[i].q]=1}
+  pool=pool.concat(fresh);}
+ S.seen=seen;S.deck=pool;S.i=0;S.score=[0,0];S.ok=0;S.skip=0;S.turn=0;
+};
+})();
+
+(function(){
+var SFX=["。做完看我一眼。","。做完告诉我什么感觉。","。做完亲我一下。","。慢慢做。","。做完说一声好了。","。做完再重复一遍。","。做完抱我一下。","。中间可以停一次。","。做完问我满不满意。","。限时 2 分钟。","。演之前先说一句：我准备好了。","。演完说出你刚才最想做的事。","。笑场就重来一次。","。全程小声说话。","。演完亲我一下再退场。","。中间停下来看我一眼。","。演完抱我一下。","。最后一句台词你自己编。","。演完让我牵你起来。","。结束时保持最后一个动作 20 秒。","。演完说一句：我演完了。"];
+var norm=function(q){q=q.split("。。").join("。");for(var i=0;i<SFX.length;i++){var s=SFX[i];var k=q.length-s.length;if(k>0&&q.slice(k)===s)return {q:q,b:q.slice(0,k)}}return {q:q,b:q}};
+var LVS=["g","x","z","w"],nb={};
+for(var i=0;i<LVS.length;i++){var lv=LVS[i];
+ if(T[lv])T[lv]=T[lv].map(function(q){var r=norm(q);nb[r.q]=r.b;return r.q});
+ if(D[lv])D[lv]=D[lv].map(function(q){var r=norm(q);nb[r.q]=r.b;return r.q});
+ if(O[lv])O[lv]=O[lv].map(function(q){var r=norm(q);nb[r.q]=r.b;return r.q});
+ if(PU[lv])PU[lv]=PU[lv].map(function(q){return norm(q).q});
+ if(C[lv])C[lv]=C[lv].map(function(c){return {s:norm(c.s).q,n:c.n}});}
+for(var k in BMAP)delete BMAP[k];
+for(var k2 in nb)BMAP[k2]=nb[k2];
+})();
+
+(function(){
+ var RM=/事后|完事|做完|结束之后|我们哪一次|我们那次/;
+ var LVS=["g","x","z","w"],removed=[],dups=0;
+ for(var i=0;i<LVS.length;i++){var lv=LVS[i];if(!T[lv])continue;
+  var seen={},keep=[];
+  for(var j=0;j<T[lv].length;j++){var q=T[lv][j];
+   if(RM.test(q)){removed.push(lv+"|"+q);continue}
+   if(seen[q]){dups++;continue}seen[q]=1;keep.push(q)}
+  T[lv]=keep;}
+ window.__removed=removed;
+ console.log("RM_COUNT="+removed.length+" DUPS="+dups);
+})();
+(function(){
+var N={"g":["你觉得我最像哪种动物？为什么？","如果我们可以瞬移，你最想去哪吃一顿？","你最想看我穿什么风格？","你手机里存了我几张照片？","你最想和我一起做什么无聊的事？","你觉得我笑起来像谁？","你最想给我起什么外号？","你有没有偷偷学我说话？","你最想带我去见哪个朋友？","你觉得我们俩谁更会撒娇？","你最想和我一起养什么？","你最想跟我去哪个演唱会或音乐节？","你觉得我最怕什么？","你最想我们老了以后一起做什么？","如果给你一天当我，你会干什么？"],"x":["你第一次觉得完了我陷进去了，是什么时候？","你在朋友面前怎么形容我？","你最想让我知道你的哪个缺点？","如果我哪天真哭了，你第一反应会是什么？","你最想我记住你的什么？","你有没有过怕失去我的时候？","你希望我在你难过的时候做什么？","你最想我们吵架之后怎么和好？","你嫉妒过我身边谁？实话。","你有没有为我改变过什么？","你最想和我说、又一直没说的那句话是什么？","你希望我们多久聊一次心里话？","你觉得我了解你吗？打几分。","你最想我们的关系里多一点什么？","你怕不怕我们会变？","你有没有偷偷想过跟我分开？后来怎么不想了？","你最想被我怎么夸？","你觉得我最不懂你的是什么？","你最想让我改的脾气是什么？","如果我做了什么你会真的失望？","你最想和我一起完成的一件大事是什么？","你最想在我身上学什么？","你希望我多依赖你一点，还是多独立一点？","你有没有在我面前装过没事？","你最想我什么时候主动抱你？","你觉得我们谁更会照顾人？","你最想我们的家是什么样子？","你希望我怎样对你家里人？","你有没有过一瞬间觉得我很陌生？","你最想我保留你送的什么东西？","你会吃我哪个朋友的醋？","你希望我怎么回应你的撒娇？","你最想和我坦白的一件小事？","如果只剩一年，你最想和我怎么过？","你希望我记住你说过的哪句话？","你有没有说过伤我的话？哪句？","你最想让我陪你做什么无聊的事？","你希望我怎么叫你？","你最想我当你是什么人，除了恋人？","你希望我什么时候闭嘴听你说？","你最想我了解你的哪段过去？","你有没有为我们的未来偷偷做什么？","你觉得我哪句话最像承诺？","你最想和我约定什么？","如果让你给我写一句话，你会写什么？"],"z":["你最喜欢我身上什么味道？","你最喜欢我哪个表情？","你最喜欢我穿什么？","你最喜欢我哪件衣服？","你觉得我什么时候最好看？","你最喜欢我头发什么样的状态？","你最喜欢我说话什么语气？","你最喜欢我哪个小动作？","你第一次牵我手时在想什么？","你第一次抱我时什么感觉？","你最想被我怎么抱？","你最喜欢我们接吻的哪个瞬间？","你最想我什么时候吻你？","你觉得我最撩人的是什么时候？","你希望我在外面怎么牵你？","你最喜欢我靠近你时的什么？","你最想我在你耳边说什么？","你希望我睡前跟你说什么？","你最喜欢我早上什么样子？","你最想我在你忙的时候发什么消息？","你觉得我声音好听吗？什么时候最好听？","你最喜欢我笑还是我认真？","你最想和我做什么不花钱的约会？","你希望我们的周末怎么过？","你最想和我一起看什么类型的电影？","你有没有偷偷看我很久？","你最想我在你生病时做什么？","你最喜欢我担心你时的样子吗？","你最想我记住你的哪个瞬间？","你希望我在你身边时安静点还是闹一点？","你觉得我哪一点最性感，性格也算？","你最想被我怎么夸？","你最喜欢我什么时候的眼神？","你最想我在你出门前做什么？","你希望我们拍照时怎么站？","你最想和我去哪个地方看夜景？","你最想我们的第一次约会重来一遍吗？为什么？","你最想我在你朋友圈怎么出现？","你希望我多穿什么风格？","你最喜欢我什么习惯？","你最想我为你写点什么？","你希望我怎么陪你过生日？","你最想我记住你的什么喜好？","你最喜欢我们安静待着的时候吗？"],"w":["你最怕我触碰你什么底线？","你希望我什么时候先问你？","你最想我怎么确认你准备好了？","你最想我先了解你什么再进一步？","你觉得我们之间最缺什么沟通？","你最想我怎么说等一下？","你希望我多大程度上听你的？","你最想我承诺你什么？","你最想我们之间保留什么秘密？","你最想我怎么保护你？","你有没有话想说又怕我多想？","你最怕我误会你什么？","你希望我怎么处理我们的分歧？","你最想我什么时候停下来问一句还好吗？","你觉得我们谁更该先说真心话？","你最想我别在什么时候开玩笑？","你希望我把哪些事提前跟你说？","你最想我怎么拒绝你？","你最想我怎么道歉才有效？","你希望我们吵架时谁先低头？","你最想我记住你的哪个忌讳？","你最想我们怎么谈以后？","你最想我给关系立什么规矩？","你希望我怎么对待你的边界？","你最想我什么时候坦白我的想法？","你怕我哪一天不说了吗？","你最想我保留什么不说？","你希望我们多久确认一次彼此还好？","你最想我先问你的哪个问题？","你最想我在这段关系里承担什么？","你希望我答应你什么，又不想逼我？","你最想我们在什么情况下互换角色？","你最想我什么时候听你的、什么时候拿主意？","你最想对我说的谢谢有哪些？"]};
+var lv,i;
+for(lv in N){T[lv]=T[lv].concat(N[lv])}
+var NA={};for(lv in N){for(i=0;i<N[lv].length;i++)NA[N[lv][i]]=1}
+window.__NA=NA;
+function sh(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}}
+var old=build;
+build=function(){
+ old.apply(null,arguments);
+ if(S.mode!=="truth")return;
+ var by={},ord=[],k,c,i;
+ for(i=0;i<S.deck.length;i++){c=S.deck[i];if(!by[c.lv]){by[c.lv]=[];ord.push(c.lv)}by[c.lv].push(c)}
+ var out=[];
+ for(k=0;k<ord.length;k++){
+  var l=ord[k],grp=by[l],n=grp.length,half=Math.ceil(n/2),B=[],A=[],have={};
+  for(i=0;i<n;i++){if(l==="g"||NA[grp[i].q])B.push(grp[i]);else A.push(grp[i]);have[grp[i].q]=1}
+  if(B.length<half){var pool=[],j;for(j=0;j<T[l].length;j++){var q=T[l][j];if(!have[q]&&!S.seen[q]&&(l==="g"||NA[q]))pool.push(q)}
+   sh(pool);for(j=0;j<pool.length&&B.length<half;j++){have[pool[j]]=1;B.push({k:"t",q:pool[j],lv:l})}}
+  if(B.length>half)B=B.slice(0,half);
+  A=A.slice(0,Math.max(0,n-B.length));
+  var mix=B.concat(A);sh(mix);
+  for(i=0;i<mix.length;i++){if(!mix[i].p){var pu=PU[l]||[];if(pu.length)mix[i].p=pu[i%pu.length]}}
+  out=out.concat(mix);
+ }
+ S.deck=out.slice(0,30);
+};
+console.log("ADDED="+N.g.length+"/"+N.x.length+"/"+N.z.length+"/"+N.w.length);
+})();(function(){
+var NA=window.__NA||{};
+function sh(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}}
+var old=build;
+build=function(){
+ old.apply(null,arguments);
+ if(S.mode!=="truth")return;
+ var plan=planOf("truth",S.lvl)||planOf("truth","z");
+ var seen=S.seen||{},out=[],pi,i,q;
+ for(pi=0;pi<plan.length;pi++){
+  var lv=plan[pi][0],n=plan[pi][1],half=Math.ceil(n/2),B=[],A=[];
+  for(i=0;i<T[lv].length;i++){q=T[lv][i];if(seen[lv+"|"+q])continue;(lv==="g"||NA[q]?B:A).push(q)}
+  if(B.length<half){for(i=0;i<T[lv].length;i++){q=T[lv][i];if(B.indexOf(q)<0&&(lv==="g"||NA[q]))B.push(q)}}
+  sh(B);sh(A);
+  var sel=[],bi=0,ai=0;
+  while(sel.length<n&&bi<half&&bi<B.length)sel.push(B[bi++]);
+  while(sel.length<n&&ai<A.length)sel.push(A[ai++]);
+  while(sel.length<n&&bi<B.length)sel.push(B[bi++]);
+  for(i=0;i<sel.length;i++){var c={k:"t",q:sel[i],lv:lv};var pu=PU[lv]||[];if(pu.length)c.p=pu[i%pu.length];out.push(c);seen[lv+"|"+sel[i]]=1}
+ }
+ S.seen=seen;S.deck=out;
+};
+})();</script></body></html>
