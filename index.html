@@ -520,4 +520,48 @@ build=function(){
  add(T,NT);add(D,ND);add(O,NO);add(PU,NPU);
  console.log("BANK T.g="+T.g.length+" T.x="+T.x.length+" T.z="+T.z.length+" T.w="+T.w.length+" D.g="+D.g.length+" D.x="+D.x.length+" D.z="+D.z.length+" D.w="+D.w.length+" O.g="+O.g.length+" O.w="+O.w.length);
 })();
+
+(function(){
+ var SEX=/做爱|性交|口交|插入|插进|进去(?!了)|进入|里面|下体|私处|阴道|阴茎|高潮|射精|内射|精液|避孕|套套|弄你|弄我|上你|干你|舔下面|舔那里|几根手指|手指伸|裸|脱光|床戏|一晚上几次|用嘴还是用手|用嘴，还是用手|湿了|湿透|硬了|磨蹭|腿间|夹紧|顶到|抽送|舌头|床上|想要我|要我/;
+ var removed=[],K=["T","D","O","PU","C"];
+ function cut(list,isObj){
+  var out=[];
+  for(var i=0;i<list.length;i++){
+   var q=isObj?(list[i].s||""):list[i];
+   if(SEX.test(q)){removed.push((isObj?"C":"")+q);continue}
+   out.push(list[i]);
+  }
+  return out;
+ }
+ var k;
+ for(k in T)T[k]=cut(T[k],false);
+ for(k in D)D[k]=cut(D[k],false);
+ for(k in O)O[k]=cut(O[k],false);
+ for(k in PU)PU[k]=cut(PU[k],false);
+ for(k in C)C[k]=cut(C[k],true);
+ window.__cut=removed;
+ console.log("SEX_REMOVED="+removed.length);
+})();
+
+(function(){
+ var SEX2=/我们今晚试几次|一周几次|用嘴|除了下面|一晚上|好几次|要几次|今晚几次|试几种|第几次求饶|敏感带|你想要我多快|一次，你选什么时候/;
+ var removed=[];
+ function cut(list,isObj){var out=[];for(var i=0;i<list.length;i++){var q=isObj?(list[i].s||""):list[i];if(SEX2.test(q)){removed.push(q);continue}out.push(list[i])}return out}
+ var k;
+ for(k in T)T[k]=cut(T[k],false);
+ for(k in D)D[k]=cut(D[k],false);
+ for(k in O)O[k]=cut(O[k],false);
+ for(k in PU)PU[k]=cut(PU[k],false);
+ for(k in C)C[k]=cut(C[k],true);
+ window.__cut2=removed;
+ console.log("SEX2_REMOVED="+removed.length);
+})();
+
+(function(){
+ var R3=/自己动|磨蹭|蹭到|夹紧|顶到|骑在我/;
+ var removed=[];var k;
+ function cut(l,o){var a=[];for(var i=0;i<l.length;i++){var q=o?(l[i].s||""):l[i];if(R3.test(q)){removed.push(q);continue}a.push(l[i])}return a}
+ for(k in T)T[k]=cut(T[k]);for(k in D)D[k]=cut(D[k]);for(k in O)O[k]=cut(O[k]);for(k in PU)PU[k]=cut(PU[k]);for(k in C)C[k]=cut(C[k],1);
+ window.__cut3=removed;console.log("SEX3_REMOVED="+removed.length);window.__c3=removed.join(" | ");
+})();
 </script></body></html>
