@@ -1050,10 +1050,52 @@ build=function(){
  $('#start').addEventListener('click',function(){apply()},true);
  window.__apply=apply;window.__stats=function(){var r={};for(var q in T)r["T"+q]=T[q].length;for(var q2 in D)r["D"+q2]=D[q2].length;for(var q3 in O)r["O"+q3]=O[q3].length;return r};
  window.__clothLeft=function(){var n=0;function cnt(a){for(var q=0;q<a.length;q++){var t=typeof a[q]==="string"?a[q]:(a[q].s||"");if(CLOTH.test(t)||/衣服/.test(t))n++}}for(var kk in T)cnt(T[kk]);for(var kk2 in D)cnt(D[kk2]);for(var kk3 in O)cnt(O[kk3]);for(var kk4 in PU)cnt(PU[kk4]);for(var kk5 in C)cnt(C[kk5]);return n};
+ var DEAL_CSS='@keyframes dshDeal{0%{opacity:0;transform:translateY(34px) rotateX(32deg) scale(.93)}55%{opacity:1;transform:translateY(-5px) rotateX(0) scale(1.015)}100%{opacity:1;transform:none}}'+
+ '@keyframes dshPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}'+
+ '@keyframes dshFade{0%{opacity:0;transform:translateY(6px)}100%{opacity:1;transform:none}}'+
+ '#dealov{position:fixed;inset:0;background:radial-gradient(120% 90% at 50% 0%,rgba(70,8,30,.92),rgba(10,3,6,.96));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;z-index:999}'+
+ '#dealov .stk{position:relative;width:112px;height:158px}'+
+ '#dealov .stk i{position:absolute;inset:0;border-radius:14px;background:linear-gradient(160deg,#ff4f86,#7a0f3e);border:1px solid rgba(255,255,255,.4);box-shadow:0 14px 34px rgba(0,0,0,.5);animation:dshPulse 1s infinite ease-in-out}'+
+ '#dealov .stk i:nth-child(2){transform:rotate(-9deg) translate(-14px,5px);animation-delay:.13s;opacity:.8}'+
+ '#dealov .stk i:nth-child(3){transform:rotate(9deg) translate(14px,5px);animation-delay:.26s;opacity:.6}'+
+ '#dealov p{color:#ffd7e3;font-size:13px;letter-spacing:3px;animation:dshFade .5s ease}'+
+ '.card.dealing{animation:dshDeal .5s cubic-bezier(.22,.9,.24,1)}'+
+ '#q.dealing{animation:dshFade .4s ease .08s both}';
+ var ds=document.createElement('style');ds.textContent=DEAL_CSS;document.head.appendChild(ds);
+ function dealOverlay(){
+  if(document.getElementById('dealov'))return;
+  var d=document.createElement('div');d.id='dealov';
+  d.innerHTML='<div class="stk"><i></i><i></i><i></i></div><p>洗 牌 中</p>';
+  document.body.appendChild(d);
+  setTimeout(function(){if(d.parentNode)d.parentNode.removeChild(d)},820);
+ }
+ var qEl=null,lastQ='';
+ function hookDeal(){
+  if(typeof MutationObserver==='undefined')return;
+  var card=document.querySelector('.card'),q=document.querySelector('#q');
+  if(!card||!q||q===qEl)return;
+  qEl=q;
+  var obs=new MutationObserver(function(){
+   var t=q.textContent||'';
+   if(t===lastQ)return;lastQ=t;
+   card.classList.remove('dealing');void card.offsetWidth;card.classList.add('dealing');
+   try{if(navigator.vibrate)navigator.vibrate(12)}catch(e){}
+  });
+  obs.observe(q,{childList:true,characterData:true,subtree:true});
+ }
+ if(startBtn)startBtn.addEventListener('click',function(){
+  dealOverlay();
+  setTimeout(function(){
+   hookDeal();
+   var c=document.querySelector('.card');
+   if(c){c.classList.remove('dealing');void c.offsetWidth;c.classList.add('dealing')}
+  },900);
+ },true);
+
  var badge=document.createElement("div");
  badge.setAttribute("id","verbadge");
  badge.style.cssText="position:fixed;right:8px;bottom:8px;font-size:10px;color:rgba(255,215,227,.55);letter-spacing:.5px;pointer-events:none;z-index:99";
- badge.textContent="v10 · 2026-10-31 更新";
+ badge.textContent="v11 · 2026-10-31 更新";
  document.body.appendChild(badge);
  console.log('PARTS_READY');
 })();
