@@ -816,16 +816,23 @@ build=function(){
   }
  };
  var k,i,j;
+ var REPL=[["背诵三遍：不许反抗","背诵三遍：今晚听我的"],["让我笑一下，你看着","对我笑一下"],["让我检查你今天乖不乖","让我看看你乖不乖"],["张开嘴，让我看看","张开嘴，让我看看你"],["用牙齿轻轻咬住我的袖子","用牙齿轻轻咬一下我的睡衣袖口"],["让我选：让我吻你，还是听你的","听你的，你说做什么"]];
  function fixOne(s){
   s=trimSegs(String(s));
   if(CLOTH.test(s))return "";
-  return s.split("衣服").join("睡衣");
+  s=s.split("衣服").join("睡衣");
+  for(var ri=0;ri<REPL.length;ri++)if(s.indexOf(REPL[ri][0])>=0)s=s.split(REPL[ri][0]).join(REPL[ri][1]);
+  return s;
  }
  var QMAP={"。中间停一次。":"。停一下再继续。","中间停一次":"停一下再继续","中间停一下":"","中间可以停一下":"","。做完看着我。":"。然后抬眼看我。","做完看着我":"然后抬眼看我","。做完说一句感想。":"","。做完说一句感觉。":"","。做完说一句。":"","做完说一句感想":"","做完说一句感觉":"","做完说一句":""};
  function cleanQ(s){
   if(typeof s!=="string")return s;
   for(var q in QMAP)s=s.split(q).join(QMAP[q]);
   s=s.replace(/[，,]?\s*$/,"").replace(/。。/g,"。").replace(/，。/g,"。").replace(/\s+/g," ").trim();
+  var sp=s.indexOf(" ");
+  if(sp>0&&s.indexOf("？")<0){var pre0=s.slice(0,sp);if(/(吗|呢|什么|哪|谁|几|多|怎么|为什么|要不要|会不会|是不是|有没有)$/.test(pre0))s=pre0+"？"+s.slice(sp)}
+  var QT=["只能挑一个说","只挑一个说","挑一个说","说具体一点","说一句就好","说完看着我","说完别躲","说慢一点","说完抬眼看我"];
+  for(var qi=0;qi<QT.length;qi++){var t=QT[qi];if(s.length>t.length&&s.slice(-t.length)===t&&s.indexOf("？")<0){var pre=s.slice(0,s.length-t.length).replace(/\s+$/,"");if(pre&&!/[？。！!?]$/.test(pre))s=pre+"？"+t}}
   return s;
  }
  function fixBank(arr){
@@ -902,23 +909,42 @@ build=function(){
  }}
  window.__rebuildBag=buildBag;
  // 大冒险/命令：去掉陈旧尾句后重挂自然收尾，保证 30 局不重复
- var KNOWN=["然后亲我一下","然后看着我","然后抬眼看我","慢慢来","然后笑一下","说完看着我","说一句感想","说一句感觉","中间停一次","中间停一下","慢慢做","做完看着我","做完说一句","慢慢说出来","声音轻一点","然后靠在我肩上","然后告诉我什么感觉","然后告诉我你的感觉","做完告诉我你的感觉","做完告诉我什么感觉","结束的时候亲我一下","然后抱我一下","做完抱住我","然后靠在我背上","说完停一下","然后停下来"];
- var BAKED=/^(然后|做完|说完|说完之后|结束的时候).{0,8}$/;
+ var KNOWN=["然后亲我一下","然后看着我","然后抬眼看我","慢慢来","然后笑一下","说完看着我","说一句感想","说一句感觉","中间停一次","中间停一下","慢慢做","做完看着我","做完说一句","慢慢说出来","声音轻一点","然后靠在我肩上","然后告诉我什么感觉","然后告诉我你的感觉","做完告诉我你的感觉","做完告诉我什么感觉","结束的时候亲我一下","然后抱我一下","做完抱住我","然后靠在我背上","说完停一下","然后停下来","动作慢一点","看着我做完","别着急","中间可以停一下","中间可以歇十秒","慢慢说","抬眼看我","别移开视线","说完笑一下","说完做个深呼吸","说完等我说好","说的时候看着我","声音轻一点。","慢慢来。"];
+ var BAKED=/^(然后|做完|说完|说完之后|结束的时候|动作|看着我做完|别着急|中间|停一下|慢慢|别移开|说完|说具体点|一句就够).{0,12}$/;
  function stripTail(s){
   var p=String(s).split(" ").filter(Boolean),i;
-  for(i=0;i<10;i++){var t=p[p.length-1];if(p.length>1&&(KNOWN.indexOf(t)>=0||BAKED.test(t)))p.pop();else break}
+  for(i=0;i<10;i++){var t=p[p.length-1];if(p.length>1&&(KNOWN.indexOf(t)>=0||BAKED.test(t)||(/？$/.test(t)&&/^(说完|告诉我|问我)/.test(t))))p.pop();else break}
   return p.join(" ").replace(/[。，、\s]+$/,"");
  }
- var DT=["然后看着我","然后亲我一下","然后靠在我肩上","慢慢来"];
- var OT=["看着我","慢慢来","声音轻一点","说完停一下"];
+ var DT=["然后看着我","然后亲我一下","然后靠在我肩上","慢慢来","然后抱我一下"];
+ var OT=["看着我","慢慢来","声音轻一点","说完停一下","慢慢说","抬眼看我"];
+ var VERBALB=/说|告诉|回答|念|求|喊|叫|问|介绍|承诺|夸|形容|描述|读|唱|数/;
+ var RM=(function(){
+  var list=["让我打你屁股，打到你说话","趴好，报数，我打一下你数一下","让我趴下，我来打你三下","让我选：让我吻你，还是听你的","打到你说话","让我拍你"];
+  return list;
+ })();
+ function tailFit(b,t){
+  if(/看着我|看我/.test(b)&&/看着我|抬眼看我/.test(t))return false;
+  if(/亲|吻|含|舔|吸/.test(b)&&/亲我一下|亲我|亲/.test(t))return false;
+  if(/跪|蹲|趴/.test(b)&&/靠在我肩上/.test(t))return false;
+  if(VERBALB.test(b)&&!/看着我|抬眼看我|声音/.test(t))return false;
+  if(!VERBALB.test(b)&&/声音|说/.test(t))return false;
+  if(/慢慢来/.test(t)&&/快点|立刻|马上/.test(b))return false;
+  if(/闭眼|闭上眼|闭上眼睛|蒙上|遮住/.test(b)&&/看着我|抬眼看我/.test(t))return false;
+  return true;
+ }
  var MB={};
  function mkBag(mode){
   var list={},lv,q,r,b,seen={};
-  var src=mode==="dare"?D:O,TL=mode==="dare"?DT:OT;
+  var src=mode==="dare"?D:O;
   for(lv in src){
    var arr=[];
    for(q=0;q<src[lv].length;q++){b=stripTail(src[lv][q]);if(!b)continue;
-    for(r=0;r<TL.length;r++){var v=b+" "+TL[r];if(seen[v])continue;seen[v]=1;var card={k:mode==="dare"?"d":"o",q:v,lv:lv};if(mode==="order"){var pu=PU[lv]||[];if(pu.length)card.p=pu[arr.length%pu.length]}arr.push(card)}}
+    for(r=0;r<RM.length;r++)if(b.indexOf(RM[r])>=0){b="";break}
+    if(!b)continue;
+    var cand=[],all=mode==="dare"?DT:OT,good=[];
+    for(r=0;r<all.length;r++)if(tailFit(b,all[r]))good.push(all[r]);
+    for(r=0;r<good.length;r++){var v=b+" "+good[r];if(seen[v])continue;seen[v]=1;var card={k:mode==="dare"?"d":"o",q:v,lv:lv};if(mode==="order"){var pu=PU[lv]||[];if(pu.length)card.p=pu[arr.length%pu.length]}arr.push(card)}}
    shuffleBag(arr);list[lv]=arr;
   }
   MB[mode]=list;MB[mode+"i"]={};
