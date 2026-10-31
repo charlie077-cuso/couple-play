@@ -1052,7 +1052,7 @@ build=function(){
  window.__clothLeft=function(){var n=0;function cnt(a){for(var q=0;q<a.length;q++){var t=typeof a[q]==="string"?a[q]:(a[q].s||"");if(CLOTH.test(t)||/衣服/.test(t))n++}}for(var kk in T)cnt(T[kk]);for(var kk2 in D)cnt(D[kk2]);for(var kk3 in O)cnt(O[kk3]);for(var kk4 in PU)cnt(PU[kk4]);for(var kk5 in C)cnt(C[kk5]);return n};
  var DEAL_CSS=[
  '@keyframes dshShuf{0%,100%{transform:translate(var(--x,0),var(--y,0)) rotate(var(--r,0))}30%{transform:translate(calc(var(--x,0px) + 30px),calc(var(--y,0px) - 16px)) rotate(14deg)}60%{transform:translate(calc(var(--x,0px) - 34px),calc(var(--y,0px) + 10px)) rotate(-16deg)}80%{transform:translate(calc(var(--x,0px) + 20px),calc(var(--y,0px) + 16px)) rotate(9deg)}}',
- '@keyframes dshFly{0%{transform:translateY(8px) scale(.3) rotate(-5deg)}60%{transform:translateY(-14px) scale(1.04) rotate(0)}100%{transform:translateY(-8px) scale(1.06) rotate(0)}}',
+ '@keyframes dshFly{0%{opacity:0;transform:translate(var(--dx,0px),var(--dy,0px)) scale(var(--sc,.3)) rotate(-6deg)}60%{opacity:1}100%{transform:translate(0,0) scale(1) rotate(0);opacity:1}}',
  '@keyframes dshFadeUp{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:none}}',
  '@keyframes dshDeal{0%{opacity:0;transform:translateY(34px) rotateX(30deg) scale(.94)}55%{opacity:1;transform:translateY(-4px) rotateX(0) scale(1.01)}100%{opacity:1;transform:none}}',
  '#dealov{position:fixed;inset:0;z-index:999;display:grid;place-items:center;background:none;overflow:hidden}',
@@ -1071,7 +1071,7 @@ build=function(){
  '@keyframes dshSettle{0%{transform:scale(1.014)}100%{transform:none}}',
  '.card.settling{animation:dshSettle .32s ease}',
  '#dealov .fly{position:absolute;left:50%;top:50%;width:min(82vw,320px);height:min(54vh,300px);margin:calc(min(54vh,300px) / -2) 0 0 calc(min(82vw,320px) / -2);opacity:0;perspective:900px;will-change:transform,opacity}',
- '#dealov .fly.out{opacity:1;animation:dshFly .55s cubic-bezier(.2,.8,.2,1) forwards}',
+ '#dealov .fly.out{opacity:1;animation:dshFly .6s cubic-bezier(.2,.85,.2,1) forwards}',
  '#dealov .fly .inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.3,.7,.2,1)}',
  '#dealov .fly.flip .inner{transform:rotateY(180deg)}',
  '#dealov .face{position:absolute;inset:0;border-radius:16px;overflow:hidden;-webkit-backface-visibility:hidden;backface-visibility:hidden}',
@@ -1127,38 +1127,34 @@ build=function(){
   try{document.body.style.overflow='hidden'}catch(e){}
   setTimeout(hookDeal,120);
   setTimeout(function(){
-   if(!ov)return;
-   var fly=ov.querySelector('.fly');
-   if(fly)fly.classList.add('out');
-   var src=document.querySelector('#q');
-   var fq=ov.querySelector('.fq');
-   if(src&&fq)fq.textContent=src.textContent||'';
+   if(!ov||!real)return;
+   var fly=ov.querySelector('.fly'),deck=ov.querySelector('.deck');
+   var r=real.getBoundingClientRect(),dr=deck?deck.getBoundingClientRect():null;
+   if(fly&&r&&r.width>20){
+    fly.style.position='fixed';
+    fly.style.left=r.left+'px';fly.style.top=r.top+'px';
+    fly.style.width=r.width+'px';fly.style.height=r.height+'px';
+    fly.style.margin='0';
+    if(dr&&dr.width>4){
+     var dcx=dr.left+dr.width/2,dcy=dr.top+dr.height/2;
+     var fcx=r.left+r.width/2,fcy=r.top+r.height/2;
+     var sc=Math.max(.16,Math.min(.42,dr.width/r.width));
+     fly.style.setProperty('--dx',(dcx-fcx).toFixed(1)+'px');
+     fly.style.setProperty('--dy',(dcy-fcy).toFixed(1)+'px');
+     fly.style.setProperty('--sc',sc.toFixed(3));
+    }
+    var src=document.querySelector('#q'),fq=fly.querySelector('.fq');
+    if(src&&fq)fq.textContent=src.textContent||'';
+    fly.classList.add('out');
+   }
   },620);
   setTimeout(function(){
    if(!ov)return;
    var fly=ov.querySelector('.fly');
    if(fly){fly.style.opacity='1';fly.classList.add('flip')}
-  },980);
+  },1240);
   setTimeout(function(){
    if(!ov)return;
-   var fly=ov.querySelector('.fly');
-   var r=real?real.getBoundingClientRect():null;
-   var f=fly?fly.getBoundingClientRect():null;
-   if(fly&&r&&f&&r.width>20&&f.width>20){
-    var s=Math.min(r.width/f.width,r.height/f.height);
-    var dx=(r.left+r.width/2)-(f.left+f.width/2);
-    var dy=(r.top+r.height/2)-(f.top+f.height/2);
-    var cur='';
-    try{if(typeof getComputedStyle==='function')cur=getComputedStyle(fly).transform||''}catch(e){}
-    fly.style.animation='none';
-    fly.style.transformOrigin='50% 50%';
-    fly.style.transition='none';
-    fly.style.transform=(cur&&cur!=='none')?cur:'none';
-    void fly.offsetWidth;
-    fly.style.transition='transform .4s cubic-bezier(.25,.8,.25,1),opacity .4s ease';
-    fly.style.transform='translate('+dx.toFixed(1)+'px,'+dy.toFixed(1)+'px) scale('+s.toFixed(3)+')';
-    fly.style.opacity='1';
-   }
    var card=document.querySelector('.card')||real;
    if(card){
     if(card.classList){card.classList.remove('dealing');card.classList.remove('settling')}
@@ -1166,17 +1162,17 @@ build=function(){
    }
    if(real&&real!==card&&real.style)real.style.visibility='';
    ov.classList.add('gone');
-  },1620);
+  },1790);
   setTimeout(function(){
    if(ov&&ov.parentNode)ov.parentNode.removeChild(ov);
    try{document.body.style.overflow=''}catch(e){}
-  },2090);
+  },2260);
  },true);
 
  var badge=document.createElement("div");
  badge.setAttribute("id","verbadge");
  badge.style.cssText="position:fixed;right:8px;bottom:8px;font-size:10px;color:rgba(255,215,227,.55);letter-spacing:.5px;pointer-events:none;z-index:99";
- badge.textContent="v14 · 2026-10-31 更新";
+ badge.textContent="v15 · 2026-10-31 更新";
  document.body.appendChild(badge);
  console.log('PARTS_READY');
 })();
