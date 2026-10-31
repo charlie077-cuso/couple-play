@@ -1055,8 +1055,12 @@ build=function(){
  '@keyframes dshFly{0%{transform:translateY(8px) scale(.3) rotate(-5deg)}60%{transform:translateY(-14px) scale(1.04) rotate(0)}100%{transform:translateY(-8px) scale(1.06) rotate(0)}}',
  '@keyframes dshFadeUp{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:none}}',
  '@keyframes dshDeal{0%{opacity:0;transform:translateY(34px) rotateX(30deg) scale(.94)}55%{opacity:1;transform:translateY(-4px) rotateX(0) scale(1.01)}100%{opacity:1;transform:none}}',
- '#dealov{position:fixed;inset:0;z-index:999;display:grid;place-items:center;background:radial-gradient(120% 80% at 50% 0%,#4a0a24 0%,#1a0410 55%,#0a0104 100%);transition:opacity .35s ease}',
- '#dealov.gone{opacity:0}',
+ '#dealov{position:fixed;inset:0;z-index:999;display:grid;place-items:center;background:none;overflow:hidden}',
+ '#dealov .bg{position:absolute;inset:0;background:radial-gradient(120% 80% at 50% 0%,#4a0a24 0%,#1a0410 55%,#0a0104 100%);opacity:1;transition:opacity .4s ease;will-change:opacity}',
+ '#dealov.gone .bg{opacity:0}',
+ '#dealov .deck,#dealov p{transition:opacity .28s ease}',
+ '#dealov.gone .deck,#dealov.gone p{opacity:0}',
+ '#dealov .fly{z-index:3}',
  '#dealov .deck{position:absolute;left:50%;top:50%;width:96px;height:134px;margin:-67px 0 0 -48px}',
  '#dealov .deck i{position:absolute;inset:0;border-radius:10px;background:linear-gradient(150deg,#6b1030,#34061a 70%);border:1px solid rgba(201,162,39,.75);box-shadow:0 12px 26px rgba(0,0,0,.55),inset 0 0 0 3px rgba(201,162,39,.18);animation:dshShuf .6s ease-in-out infinite}',
  '#dealov .deck i:nth-child(1){--x:-7px;--y:5px;--r:-7deg}',
@@ -1091,7 +1095,7 @@ build=function(){
  function dealOverlay(){
   if(document.getElementById('dealov'))return null;
   var d=document.createElement('div');d.id='dealov';
-  d.innerHTML='<div class="deck"><i></i><i></i><i></i><i></i><i></i></div>'+
+  d.innerHTML='<div class="bg"></div><div class="deck"><i></i><i></i><i></i><i></i><i></i></div>'+
    '<div class="fly"><div class="inner"><div class="face back"></div><div class="face front"><div class="fq"></div></div></div></div>'+
    '<p>洗 牌 中</p>';
   document.body.appendChild(d);
@@ -1120,6 +1124,7 @@ build=function(){
   var ov=dealOverlay();
   var real=document.querySelector('.card');
   if(real&&real.style)real.style.visibility='hidden';
+  try{document.body.style.overflow='hidden'}catch(e){}
   setTimeout(hookDeal,120);
   setTimeout(function(){
    if(!ov)return;
@@ -1150,26 +1155,28 @@ build=function(){
     fly.style.transition='none';
     fly.style.transform=(cur&&cur!=='none')?cur:'none';
     void fly.offsetWidth;
-    fly.style.transition='transform .42s cubic-bezier(.25,.8,.25,1),opacity .42s ease';
+    fly.style.transition='transform .4s cubic-bezier(.25,.8,.25,1),opacity .4s ease';
     fly.style.transform='translate('+dx.toFixed(1)+'px,'+dy.toFixed(1)+'px) scale('+s.toFixed(3)+')';
     fly.style.opacity='1';
    }
+   var card=document.querySelector('.card')||real;
+   if(card){
+    if(card.classList){card.classList.remove('dealing');card.classList.remove('settling')}
+    if(card.style)card.style.visibility='';
+   }
+   if(real&&real!==card&&real.style)real.style.visibility='';
    ov.classList.add('gone');
   },1620);
   setTimeout(function(){
    if(ov&&ov.parentNode)ov.parentNode.removeChild(ov);
-   if(real){
-    if(real.style)real.style.visibility='';
-    if(real.classList){real.classList.remove('dealing');real.classList.add('settling');
-     setTimeout(function(){if(real.classList)real.classList.remove('settling')},340)}
-   }
-  },2080);
+   try{document.body.style.overflow=''}catch(e){}
+  },2090);
  },true);
 
  var badge=document.createElement("div");
  badge.setAttribute("id","verbadge");
  badge.style.cssText="position:fixed;right:8px;bottom:8px;font-size:10px;color:rgba(255,215,227,.55);letter-spacing:.5px;pointer-events:none;z-index:99";
- badge.textContent="v13 · 2026-10-31 更新";
+ badge.textContent="v14 · 2026-10-31 更新";
  document.body.appendChild(badge);
  console.log('PARTS_READY');
 })();
