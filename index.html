@@ -744,4 +744,219 @@ build=function(){
  window.__ov=function(){var r={};for(k in O)r[k]=O[k].length;return r};
  console.log("OVAR5 "+n);
 })();
-</script></body></html>
+</script><script>
+/* inlined preview patch */
+(function(){
+ function $(s){return document.querySelector(s)}
+ var UI='<button class="pbtn" id="pbtn">可接受的身体接触 · 默认全选</button>'+
+ '<div class="chips" id="parts" style="display:none">'+
+ '<button class="chip on" data-p="嘴">嘴／唇</button>'+
+ '<button class="chip on" data-p="脖子">脖子</button>'+
+ '<button class="chip on" data-p="耳朵">耳朵</button>'+
+ '<button class="chip on" data-p="胸">胸</button>'+
+ '<button class="chip on" data-p="腰">腰</button>'+
+ '<button class="chip on" data-p="背">背</button>'+
+ '<button class="chip on" data-p="腿">腿</button>'+
+ '<button class="chip on" data-p="手">手</button>'+
+ '<button class="chip on" data-p="脚">脚</button>'+
+ '<button class="chip on" data-p="臀">臀</button>'+
+ '<button class="chip on" data-p="脸">脸</button>'+
+ '<button class="chip on" data-p="头">头发</button>'+
+ '</div>';
+ var CSS='.chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:0 0 18px;padding:0 6px}'+
+ '.chip{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);color:#e6c9d4;font-size:13px;padding:7px 12px;border-radius:999px;font-family:inherit;line-height:1}'+
+ '.chip.on{background:linear-gradient(135deg,#ff4f86,#b3125a);border-color:transparent;color:#fff;font-weight:600}'+
+ '.pbtn{display:block;width:100%;max-width:330px;margin:0 auto 10px;background:rgba(255,255,255,.07);border:1px dashed rgba(255,79,134,.55);color:#ffd7e3;font-size:13px;padding:11px 12px;border-radius:14px;font-family:inherit;text-align:left}'+
+ '.pbtn b{color:#ff8fb4}';
+ var st=document.createElement('style');st.textContent=CSS;document.head.appendChild(st);
+ var startBtn=$('#start');
+ if(!startBtn){console.warn('NO_START');return}
+ startBtn.insertAdjacentHTML('beforebegin',UI);
+
+ var TAILSEG=/^(中间|中间可以|中间停|歇十秒|停一下|停下来|说完停一下|说的时候停一下)/;
+ var CLOTH=/扣子|衬衫|外套|拉链|解开|脱掉|脱光|脱|拉下去|穿好|衣领|脱下来/;
+ function trimSegs(s){
+  s=String(s);
+  var p=s.split(" "),o=[];
+  for(var i=0;i<p.length;i++){var t=p[i];if(!t)continue;if(TAILSEG.test(t))continue;o.push(t)}
+  return o.join(" ").replace(/[，、]\s*$/,"").trim();
+ }
+ var NX={
+  T:{x:[
+   "你最想我用嘴唇碰你哪里","你的锁骨被亲的时候会痒吗","你希望我在你脖子上留下痕迹吗","你喜欢被含着耳垂吗","你最想被摸头还是被摸脸","你会因为我靠得太近而脸红吗","你最喜欢我牵你的哪只手","你希望我抱你的时候手放哪儿","你最想被我在耳边说什么","你介意我摸你的腰吗","你最想被我碰的部位是哪里","你喜欢我吻你的额头还是脸颊"],
+   z:[
+   "你希望我用嘴吸你的锁骨吗","你想不想让我在你脖子上种一颗草莓","你喜欢被咬耳垂还是被含住耳垂","你希望我把手放在你腰上还是背上","你想不想让我吻你的胸口","你最喜欢被亲哪个部位","你喜欢我隔着睡衣碰你还是贴上来","你想让我从脖子还是从腰开始","你希望我亲你的手背还是手心","你想不想试试坐在我腿上","你喜欢我贴在你胸口听心跳吗","你希望我用手还是用嘴","你最想被我在哪儿留下印记","你喜欢我环住你的腰还是搭在你肩上"],
+   w:[
+   "你想让我用嘴吸你的胸部吗，到什么程度","你希望我用牙轻轻咬你的胸口吗","你想让我在你脖子上种几颗草莓","你喜欢我一边亲你一边抱住你吗","你想让我把脸埋进你的胸口吗","你希望我隔着睡衣抚过你哪里","你想让我亲到你的腰侧吗","你会在被我吸到出声的时候脸红吗","你希望我在你耳边喘一下吗","你想让我隔着睡衣亲你的锁骨吗","你喜欢被我从背后抱住然后亲脖子吗","你希望我用手掌按住你的后腰吗","你会因为我咬你耳垂而有反应吗","你想让我把你按到床边亲你吗","你希望我把手放在你的大腿上吗","你会主动拉我的手放到你身上吗"]
+  },
+  D:{x:[
+   "用嘴唇碰一下我的锁骨","把脸贴在我的脖子上 停 5 秒","含住我的耳垂 3 秒","用鼻尖蹭一下我的脸","牵着我的手，用拇指摩挲我的手背","把我的手放在你的腰上","轻轻摸一下我的头发","亲一下我的手心","和我额头贴额头 10 秒","用脸颊贴一下我的脸颊","在我脖子侧面吹一口气","吻一下我的嘴角"],
+   z:[
+   "用嘴唇碰一下我的锁骨，再抬眼看我","趴到我腿上，在我脖子上种一颗草莓","用牙齿轻轻咬一下我的耳垂","把手伸进我睡衣里，沿着腰线摸一圈","用脸蹭我的胸口","亲一下我的腰侧","拉过我的手，按在你的胸口","含住我的一根手指，看着我","吻我的脖子，慢慢往下","用嘴唇从上往下碰我的手臂","站到我背后抱住我，亲我的后颈","用嘴含住我的耳垂，再轻轻吐出来","把我的手拉进你的睡衣里","吻我的锁骨，再抬头看我"],
+   w:[
+   "用嘴吸我的胸部，直到听见我出声","爬到对方腿上，在脖子上种一颗草莓","用牙齿咬住我的耳垂，再喘一口气","把手伸进我睡衣里，从腰摸到背","隔着睡衣咬一口我的胸口","亲我的腰侧，再往上亲","让我坐在你腿上，含住我的耳垂","用嘴唇从我的锁骨滑到胸口","从脖子亲到肩膀，再往下","把我按在床边，从脖子亲到胸口","用嘴吸我的锁骨，留下一个印子","把手放在我的大腿上，来回摸","从背后抱住我，亲我的脖子再咬一下","用手指沿着我的锁骨划过去","亲我的胸口，再抬眼看我","把脸埋进我的胸口 停 10 秒"]
+  }
+ };
+ var NX2={
+  T:{z:["你希望我抱着你的时候手放在哪儿","你喜欢被我从背后环住吗","你想不想让我把手贴在你后腰上","你希望我亲你的肩膀吗","你喜欢我贴着你说话吗"],
+     w:["你希望我把手放在你后腰上不放吗","你想让我从背后抱住你、在你耳边说话吗","你希望我亲你的肩膀再往下吗","你想让我把脸埋进你颈窝里吗"]},
+  D:{z:["隔着睡衣抱住我 停 20 秒","把手放在我的后腰上","用嘴唇碰一下我的肩膀","把头靠在我的颈窝里","让我枕在你腿上 10 秒","手指沿着我的锁骨慢慢划一遍","贴着我的耳朵说一句悄悄话","握住我的手腕，贴在你的胸口"],
+     w:["隔着睡衣抱住我 停 20 秒","把头埋进我的颈窝里，呼吸","用嘴唇从我的肩膀滑到锁骨","抱住我，把手放在我的后腰上","让我靠在你胸口，听你的心跳","从背后环住我的腰，贴着我说话"]}
+ };
+ var NX3={
+  T:{z:["你想让我亲你哪里，说具体点","你希望我抱着你的时候用多大力气","你想不想让我用嘴唇碰你的耳后","你喜欢我贴在你耳边说话还是安静"],
+     w:[
+     "你想让我把舌头伸进你嘴里吗","你希望我咬你的脖子留下印子吗","你想让我一只手按住你的手腕，另一只手摸你吗","你希望我把你压在身下多久","你想让我隔着睡衣用胸口贴着你吗","你希望我一边亲你一边喘给你听吗","你想让我把手指放进你嘴里吗","你希望我把腿抵在你两腿之间吗","你想让我亲到你出声吗","你希望我贴着你耳朵说几句脏话","你想让我在你身上留下几个印子","你希望我一边说一边碰你哪里",
+     "你想让我把你按在床上吗","你希望我亲你的时候用多大力气","你想让我从耳边一路亲到脖子吗","你希望我把你的手腕按过头顶吗","你想让我咬你哪里，说具体点","你希望我们离得多近","你想让我贴着你耳朵说话，说多久","你希望我把你搂多紧","你想让我把腿压在你腿上吗","你希望我亲到你说停吗","你想让我用手捧住你的脸亲你吗","你希望我在你脖子上留几个印子","你想让我一边亲你一边解开你的头发吗","你希望我把你抱起来吗","你想让我用鼻尖蹭你的脖子吗","你希望我坐着把你圈在腿上吗","你想让我把你的睡裤边拉高一点吗","你希望我把手放在你后颈上吗","你想让我贴着你的额头说话吗","你希望我说什么的时候声音放低","你想让我在灯关掉之后继续吗","你希望我把你手拉过来放在我胸口吗","你想让我从背后贴着你蹭一下吗","你希望我把你按在墙上亲吗","你想让我一直抱着你不放开吗","你希望我把嘴唇贴在你眼睛上吗","你想让我亲你的指尖吗","你希望我把你抱到床中间吗","你想让我在你耳边慢慢数到十吗",
+     "你想让我用嘴唇把你从脖子亲到肩膀吗","你希望我在你耳边喘几下","你想让我隔着睡衣感受你的心跳吗","你希望我一边亲你一边叫你的名字吗","你想让我把手指插进你的指缝吗","你希望我在你耳垂上停多久","你想让我从背后抱住你再咬一下吗","你希望我把你的脸转过来亲吗","你想让我贴着你睡一会儿吗","你希望我在你锁骨上停一下吗","你想让我用鼻尖从你脖子滑到胸口吗","你希望我一边摸你的后脖颈一边亲你吗","你想让我在你耳边说一句只有你听得见的话吗","你希望我把你的手按在我心口吗","你想让我用牙轻轻拖过你的手腕吗","你希望我把你搂进怀里再低头亲你吗","你想让我在你身上留下今晚的记号吗","你希望我关灯之后慢慢来吗","你想让我抱着你聊一会儿再动手动脚吗","你希望我亲你的时候别太客气吗"]
+  },
+  D:{z:["用指腹慢慢摩挲我的后颈","把我的手腕按在床头 10 秒","用嘴唇碰一下我的耳后","从背后贴着我，把下巴放在我肩上"],
+     w:[
+     "把我按在床上，亲我的脖子直到我出声","用牙齿咬住我的锁骨，留下一个印子","把舌头伸进我嘴里，别太温柔","一只手按住我的手腕，另一只手从我后腰往下滑","贴着我耳朵说一句最脏的话","把腿抵在我两腿之间，看我反应","含住我的舌尖，慢慢退开","从我脖子一路咬到肩膀","用手掌从我的胸口滑到腰","让我坐在你腿上，隔着睡衣贴紧你","把脸埋进我胸口，用牙轻咬","抓着我的头发，把我的头抬起来亲"]
+  }
+ };
+ var k,i,j;
+ function fixOne(s){
+  s=trimSegs(String(s));
+  if(CLOTH.test(s))return "";
+  return s.split("衣服").join("睡衣");
+ }
+ var QMAP={"。中间停一次。":"。停一下再继续。","中间停一次":"停一下再继续","中间停一下":"","中间可以停一下":"","。做完看着我。":"。然后抬眼看我。","做完看着我":"然后抬眼看我","。做完说一句感想。":"","。做完说一句感觉。":"","。做完说一句。":"","做完说一句感想":"","做完说一句感觉":"","做完说一句":""};
+ function cleanQ(s){
+  if(typeof s!=="string")return s;
+  for(var q in QMAP)s=s.split(q).join(QMAP[q]);
+  s=s.replace(/[，,]?\s*$/,"").replace(/。。/g,"。").replace(/，。/g,"。").replace(/\s+/g," ").trim();
+  return s;
+ }
+ function fixBank(arr){
+  var out=[],hs={};
+  for(j=0;j<(arr||[]).length;j++){var v=cleanQ(fixOne(arr[j]));if(!v||hs[v])continue;hs[v]=1;out.push(v)}
+  return out;
+ }
+ for(k in T)T[k]=fixBank(T[k]);
+ for(k in D)D[k]=fixBank(D[k]);
+ for(k in O)O[k]=fixBank(O[k]);
+ for(k in PU)PU[k]=fixBank(PU[k]);
+ [NX,NX2,NX3].forEach(function(set){
+  for(k in set.T){if(!T[k])T[k]=[];T[k]=T[k].concat(set.T[k].map(fixOne).filter(Boolean))}
+  for(k in set.D){if(!D[k])D[k]=[];D[k]=D[k].concat(set.D[k].map(fixOne).filter(Boolean))}
+ });
+ // 清掉 build 时追加的旧尾句（含「中间停一次」「做完…」），并扩充尾句种类
+ if(typeof TAIL==="object"&&TAIL){
+  var TAILFIX={"。做完看着我。":"。然后看着我。","。做完说一句。":"。说一句。","。做完说一句感想。":"。说一句感想。","。慢慢来。":"。慢慢来。"};
+  for(var mk in TAIL){for(var mlv in TAIL[mk]){
+   TAIL[mk][mlv]=TAIL[mk][mlv].map(function(t){return TAILFIX[t]||t}).filter(function(t){return !/中间|做完|演完/.test(t)}).map(function(t){return t.split("衣服").join("睡衣")});
+  }}
+  if(TAIL.truth&&TAIL.truth.w)TAIL.truth.w=TAIL.truth.w.concat(["说慢一点。","说完看着我。","一句就够。","说完别躲。","看着我说。","声音别抖。","说完就看着我。","想好了再说。"]);
+  if(TAIL.truth&&TAIL.truth.z)TAIL.truth.z=TAIL.truth.z.concat(["说具体一点。","只挑一个说。","说完看着我。"]);
+  if(TAIL.dare&&TAIL.dare.w)TAIL.dare.w=TAIL.dare.w.concat(["。然后看着我。","。慢慢来。","。做完再说。"]);
+  if(TAIL.order&&TAIL.order.w)TAIL.order.w=TAIL.order.w.concat(["。慢慢做。","。做完看我一眼。"]);
+ };
+ for(k in C)C[k]=(C[k]||[]).filter(function(c){return !CLOTH.test(c.s||"")&&!/衣服/.test(c.s||"")});
+ var PM=[["胸",/胸|乳/],["脖子",/脖|颈|锁骨|喉/],["耳朵",/耳/],["嘴",/嘴|唇|吻|亲|含|吸|舌/],["腰",/腰/],["背",/背|后背/],["腿",/腿|膝|大腿/],["手",/手|指/],["脚",/脚|足/],["臀",/臀|屁股/],["脸",/脸|颊/],["头",/头发|头顶/]];
+ window.__ORIG={T:JSON.parse(JSON.stringify(T)),D:JSON.parse(JSON.stringify(D)),O:JSON.parse(JSON.stringify(O)),PU:JSON.parse(JSON.stringify(PU)),C:JSON.parse(JSON.stringify(C))};
+ function allowed(s){
+  if(!s)return true;
+  for(var q=0;q<PM.length;q++){var p=PM[q][0];if(PM[q][1].test(s)&&!S.parts[p])return false}
+  return true;
+ }
+ function apply(){var o=window.__ORIG;
+  T=JSON.parse(JSON.stringify(o.T));D=JSON.parse(JSON.stringify(o.D));O=JSON.parse(JSON.stringify(o.O));PU=JSON.parse(JSON.stringify(o.PU));C=JSON.parse(JSON.stringify(o.C));
+  var kk;for(kk in T)T[kk]=T[kk].filter(allowed);
+  for(kk in D)D[kk]=D[kk].filter(allowed);
+  for(kk in O)O[kk]=O[kk].filter(allowed);
+  for(kk in PU)PU[kk]=PU[kk].filter(allowed);
+  for(kk in C)C[kk]=C[kk].filter(function(c){return allowed(c.s||"")});
+ }
+ var PN=["嘴","脖子","耳朵","胸","腰","背","腿","手","脚","臀","脸","头"];
+ S.parts={};
+ for(i=0;i<PN.length;i++)S.parts[PN[i]]=1;
+ if(typeof planOf==="function"){var _po=planOf;planOf=function(m,lv){if(m==="truth"&&lv==="w")return [["z",6],["w",24]];return _po(m,lv)}}
+ // 热烈档真心话：自建不重复抽卡池
+ var BAG={z:[],w:[],zi:0,wi:0};
+ function shuffleBag(a){for(var q=a.length-1;q>0;q--){var r=Math.floor(Math.random()*(q+1)),t=a[q];a[q]=a[r];a[r]=t}}
+ var TZ=["说具体一点。","只挑一个说。","说完看着我。"];
+ var TW=["说具体一点。","只能挑一个。","小声说。","说完看着我。","别绕弯子。","说慢一点。","一句就够。","说完别躲。","看着我说。"];
+ function buildBag(){
+  var tz=TZ,tw=TW;
+  var zs=[],ws=[],q,r,seen={},key;
+  for(q=0;q<(T.z||[]).length;q++)for(r=0;r<tz.length;r++){key=(T.z[q]+" "+tz[r]).trim();if(seen[key])continue;seen[key]=1;zs.push({k:"t",q:key,lv:"z"})}
+  for(q=0;q<(T.w||[]).length;q++)for(r=0;r<tw.length;r++){key=(T.w[q]+" "+tw[r]).trim();if(seen[key])continue;seen[key]=1;ws.push({k:"t",q:key,lv:"w"})}
+  shuffleBag(zs);shuffleBag(ws);
+  BAG.z=zs;BAG.w=ws;BAG.zi=0;BAG.wi=0;
+ }
+ function takeBag(key,n){
+  var list=BAG[key];
+  if(BAG[key+"i"]+n>list.length){buildBag();list=BAG[key]}
+  var out=list.slice(BAG[key+"i"],BAG[key+"i"]+n);BAG[key+"i"]+=n;return out;
+ }
+ if(typeof build==="function"){var _build=build;build=function(){
+  _build();
+  var di;
+  for(di=0;di<S.deck.length;di++){var o=S.deck[di];o.q=cleanQ(o.q)}
+  if(S.mode==="truth"&&S.lvl==="w"){
+   if(!BAG.z.length&&BAG.zi+BAG.wi===0)buildBag();
+   var a=takeBag("z",6),b=takeBag("w",24),deck=a.concat(b);
+   shuffleBag(deck);S.deck=deck;S.i=0;
+  }
+ }}
+ window.__rebuildBag=buildBag;
+ // 大冒险/命令：去掉陈旧尾句后重挂自然收尾，保证 30 局不重复
+ var KNOWN=["然后亲我一下","然后看着我","然后抬眼看我","慢慢来","然后笑一下","说完看着我","说一句感想","说一句感觉","中间停一次","中间停一下","慢慢做","做完看着我","做完说一句","慢慢说出来","声音轻一点","然后靠在我肩上","然后告诉我什么感觉","然后告诉我你的感觉","做完告诉我你的感觉","做完告诉我什么感觉","结束的时候亲我一下","然后抱我一下","做完抱住我","然后靠在我背上","说完停一下","然后停下来"];
+ var BAKED=/^(然后|做完|说完|说完之后|结束的时候).{0,8}$/;
+ function stripTail(s){
+  var p=String(s).split(" ").filter(Boolean),i;
+  for(i=0;i<10;i++){var t=p[p.length-1];if(p.length>1&&(KNOWN.indexOf(t)>=0||BAKED.test(t)))p.pop();else break}
+  return p.join(" ").replace(/[。，、\s]+$/,"");
+ }
+ var DT=["然后看着我","然后亲我一下","然后靠在我肩上","慢慢来"];
+ var OT=["看着我","慢慢来","声音轻一点","说完停一下"];
+ var MB={};
+ function mkBag(mode){
+  var list={},lv,q,r,b,seen={};
+  var src=mode==="dare"?D:O,TL=mode==="dare"?DT:OT;
+  for(lv in src){
+   var arr=[];
+   for(q=0;q<src[lv].length;q++){b=stripTail(src[lv][q]);if(!b)continue;
+    for(r=0;r<TL.length;r++){var v=b+" "+TL[r];if(seen[v])continue;seen[v]=1;var card={k:mode==="dare"?"d":"o",q:v,lv:lv};if(mode==="order"){var pu=PU[lv]||[];if(pu.length)card.p=pu[arr.length%pu.length]}arr.push(card)}}
+   shuffleBag(arr);list[lv]=arr;
+  }
+  MB[mode]=list;MB[mode+"i"]={};
+ }
+ function takeMB(mode,lv,n){
+  if(!MB[mode])mkBag(mode);
+  var arr=MB[mode][lv]||[],p=MB[mode+"i"][lv]||0;
+  if(p+n>arr.length){shuffleBag(arr);MB[mode][lv]=arr;p=0}
+  MB[mode+"i"][lv]=p+n;return arr.slice(p,p+n);
+ }
+ var DECKSEEN={},DECKKEY="";
+ function takeUnique(mode,lv,n){
+  var key=mode+"|"+(S&&S.lvl);
+  if(key!==DECKKEY){DECKKEY=key;DECKSEEN={};MB={}}
+  var out=[],guard=0;
+  while(out.length<n&&guard++<40){
+   var got=takeMB(mode,lv,n-out.length);
+   for(var z=0;z<got.length;z++){if(DECKSEEN[got[z].q])continue;DECKSEEN[got[z].q]=1;out.push(got[z])}
+  }
+  return out;
+ }
+ if(typeof build==="function"){var _build2=build;build=function(){
+  _build2();
+  if(S.mode==="dare"||S.mode==="order"){
+   var plan=planOf(S.mode,S.lvl),deck=[],pi;
+   for(pi=0;pi<plan.length;pi++)deck=deck.concat(takeUnique(S.mode,plan[pi][0],plan[pi][1]));
+   shuffleBag(deck);S.deck=deck;S.i=0;
+  }
+ }}
+ var chips=document.querySelectorAll("#parts .chip");
+ for(i=0;i<chips.length;i++){chips[i].onclick=function(){var p=this.getAttribute("data-p");if(S.parts[p]){delete S.parts[p];this.classList.remove("on")}else{S.parts[p]=1;this.classList.add("on")}}}
+ var pbtn=$('#pbtn');
+ if(pbtn)pbtn.onclick=function(){var panel=$('#parts');if(!panel)return;var open=panel.style.display!=="none";panel.style.display=open?"none":"flex";this.innerHTML=open?'可接受的身体接触 · 默认全选':'收起部位选择'};
+ $('#start').addEventListener('click',function(){apply()},true);
+ window.__apply=apply;window.__stats=function(){var r={};for(var q in T)r["T"+q]=T[q].length;for(var q2 in D)r["D"+q2]=D[q2].length;for(var q3 in O)r["O"+q3]=O[q3].length;return r};
+ window.__clothLeft=function(){var n=0;function cnt(a){for(var q=0;q<a.length;q++){var t=typeof a[q]==="string"?a[q]:(a[q].s||"");if(CLOTH.test(t)||/衣服/.test(t))n++}}for(var kk in T)cnt(T[kk]);for(var kk2 in D)cnt(D[kk2]);for(var kk3 in O)cnt(O[kk3]);for(var kk4 in PU)cnt(PU[kk4]);for(var kk5 in C)cnt(C[kk5]);return n};
+ console.log('PARTS_READY');
+})();
+
+</script>
+</body></html>
