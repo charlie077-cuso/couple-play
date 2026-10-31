@@ -883,11 +883,20 @@ build=function(){
  }
  function apply(){var o=window.__ORIG;
   T=JSON.parse(JSON.stringify(o.T));D=JSON.parse(JSON.stringify(o.D));O=JSON.parse(JSON.stringify(o.O));PU=JSON.parse(JSON.stringify(o.PU));C=JSON.parse(JSON.stringify(o.C));
-  var kk;for(kk in T)T[kk]=T[kk].filter(allowed);
-  for(kk in D)D[kk]=D[kk].filter(allowed);
-  for(kk in O)O[kk]=O[kk].filter(allowed);
-  for(kk in PU)PU[kk]=PU[kk].filter(allowed);
-  for(kk in C)C[kk]=C[kk].filter(function(c){return allowed(c.s||"")});
+  var kk;for(kk in T)T[kk]=T[kk].filter(allowed).filter(function(s){return !boring(s)});
+  for(kk in D)D[kk]=D[kk].filter(allowed).filter(function(s){return !boring(s)});
+  for(kk in O)O[kk]=O[kk].filter(allowed).filter(function(s){return !boring(s)});
+  for(kk in PU)PU[kk]=PU[kk].filter(allowed).filter(function(s){return !boring(s)});
+  for(kk in C)C[kk]=C[kk].filter(function(c){return allowed(c.s||"")&&!boring(c.s||"")});
+ }
+ var BORING=/(对视|肩并肩|捶背|太阳穴|对着我笑|抱起来离地|站到我旁边|站我身后|站到我面前|跟我一起数|数到|比心|打个响指|拍手|鼓掌|学我|模仿|做个鬼脸|吐舌头|眨|收拾|倒一杯水|递给我|帮我拿着|走一圈|原地|绕着我走|唱歌|讲个笑话|背一首|念一首)/;
+ var INTIMATE=/亲|吻|舔|咬|含|贴|靠|坐|腿|腰|胸|颈|脖|耳|睡衣|压|按住|拉进|贴紧|胸口|大腿|手|肩|头发|下巴|额头|锁骨|臀/;
+ function boring(s){
+  if(!s)return false;
+  if(BORING.test(s))return true;
+  if(/\d+\s*秒/.test(s)&&s.length<20&&!INTIMATE.test(s))return true;
+  if(/\d+\s*秒/.test(s)&&/(站|坐|躺|举|伸|看|闭眼|别动|保持|不动)/.test(s)&&!INTIMATE.test(s))return true;
+  return false;
  }
  var PN=["嘴","脖子","耳朵","胸","腰","背","腿","手","脚","臀","脸","头"];
  S.parts={};
@@ -997,7 +1006,7 @@ build=function(){
     var seenK={},tmp=[];
     for(k=0;k<got.length;k++){var bk=bkey(got[k].q);if(seenK[bk])continue;seenK[bk]=1;tmp.push(got[k])}
     got=tmp;
-    for(k=0;k<got.length;k++){c2=got[k];deck.push({k:c2.k,q:c2.q,lv:lv2,p:(S.mode==="order"&&PU[lv2]&&PU[lv2].length)?PU[lv2][k%PU[lv2].length]:undefined})}
+    for(k=0;k<got.length;k++){c2=got[k];deck.push({k:c2.k,q:c2.q,lv:lv2,p:(PU[lv2]&&PU[lv2].length)?PU[lv2][k%PU[lv2].length]:undefined})}
    }
   }
   if(deck.length){
@@ -1041,6 +1050,11 @@ build=function(){
  $('#start').addEventListener('click',function(){apply()},true);
  window.__apply=apply;window.__stats=function(){var r={};for(var q in T)r["T"+q]=T[q].length;for(var q2 in D)r["D"+q2]=D[q2].length;for(var q3 in O)r["O"+q3]=O[q3].length;return r};
  window.__clothLeft=function(){var n=0;function cnt(a){for(var q=0;q<a.length;q++){var t=typeof a[q]==="string"?a[q]:(a[q].s||"");if(CLOTH.test(t)||/衣服/.test(t))n++}}for(var kk in T)cnt(T[kk]);for(var kk2 in D)cnt(D[kk2]);for(var kk3 in O)cnt(O[kk3]);for(var kk4 in PU)cnt(PU[kk4]);for(var kk5 in C)cnt(C[kk5]);return n};
+ var badge=document.createElement("div");
+ badge.setAttribute("id","verbadge");
+ badge.style.cssText="position:fixed;right:8px;bottom:8px;font-size:10px;color:rgba(255,215,227,.55);letter-spacing:.5px;pointer-events:none;z-index:99";
+ badge.textContent="v9 · 2026-10-31 更新";
+ document.body.appendChild(badge);
  console.log('PARTS_READY');
 })();
 
