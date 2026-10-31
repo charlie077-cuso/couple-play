@@ -1050,24 +1050,50 @@ build=function(){
  $('#start').addEventListener('click',function(){apply()},true);
  window.__apply=apply;window.__stats=function(){var r={};for(var q in T)r["T"+q]=T[q].length;for(var q2 in D)r["D"+q2]=D[q2].length;for(var q3 in O)r["O"+q3]=O[q3].length;return r};
  window.__clothLeft=function(){var n=0;function cnt(a){for(var q=0;q<a.length;q++){var t=typeof a[q]==="string"?a[q]:(a[q].s||"");if(CLOTH.test(t)||/衣服/.test(t))n++}}for(var kk in T)cnt(T[kk]);for(var kk2 in D)cnt(D[kk2]);for(var kk3 in O)cnt(O[kk3]);for(var kk4 in PU)cnt(PU[kk4]);for(var kk5 in C)cnt(C[kk5]);return n};
- var DEAL_CSS='@keyframes dshDeal{0%{opacity:0;transform:translateY(34px) rotateX(32deg) scale(.93)}55%{opacity:1;transform:translateY(-5px) rotateX(0) scale(1.015)}100%{opacity:1;transform:none}}'+
- '@keyframes dshPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}'+
- '@keyframes dshFade{0%{opacity:0;transform:translateY(6px)}100%{opacity:1;transform:none}}'+
- '#dealov{position:fixed;inset:0;background:radial-gradient(120% 90% at 50% 0%,rgba(70,8,30,.92),rgba(10,3,6,.96));display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;z-index:999}'+
- '#dealov .stk{position:relative;width:112px;height:158px}'+
- '#dealov .stk i{position:absolute;inset:0;border-radius:14px;background:linear-gradient(160deg,#ff4f86,#7a0f3e);border:1px solid rgba(255,255,255,.4);box-shadow:0 14px 34px rgba(0,0,0,.5);animation:dshPulse 1s infinite ease-in-out}'+
- '#dealov .stk i:nth-child(2){transform:rotate(-9deg) translate(-14px,5px);animation-delay:.13s;opacity:.8}'+
- '#dealov .stk i:nth-child(3){transform:rotate(9deg) translate(14px,5px);animation-delay:.26s;opacity:.6}'+
- '#dealov p{color:#ffd7e3;font-size:13px;letter-spacing:3px;animation:dshFade .5s ease}'+
- '.card.dealing{animation:dshDeal .5s cubic-bezier(.22,.9,.24,1)}'+
- '#q.dealing{animation:dshFade .4s ease .08s both}';
+ var DEAL_CSS=[
+ '@keyframes dshShuf{0%,100%{transform:translate(var(--x,0),var(--y,0)) rotate(var(--r,0))}30%{transform:translate(calc(var(--x,0px) + 30px),calc(var(--y,0px) - 16px)) rotate(14deg)}60%{transform:translate(calc(var(--x,0px) - 34px),calc(var(--y,0px) + 10px)) rotate(-16deg)}80%{transform:translate(calc(var(--x,0px) + 20px),calc(var(--y,0px) + 16px)) rotate(9deg)}}',
+ '@keyframes dshFly{0%{transform:translateY(8px) scale(.3) rotate(-5deg)}60%{transform:translateY(-14px) scale(1.04) rotate(0)}100%{transform:translateY(-8px) scale(1.06) rotate(0)}}',
+ '@keyframes dshFadeUp{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:none}}',
+ '@keyframes dshDeal{0%{opacity:0;transform:translateY(34px) rotateX(30deg) scale(.94)}55%{opacity:1;transform:translateY(-4px) rotateX(0) scale(1.01)}100%{opacity:1;transform:none}}',
+ '#dealov{position:fixed;inset:0;z-index:999;display:grid;place-items:center;background:radial-gradient(120% 80% at 50% 0%,#4a0a24 0%,#1a0410 55%,#0a0104 100%);transition:opacity .35s ease}',
+ '#dealov.gone{opacity:0}',
+ '#dealov .deck{position:absolute;left:50%;top:50%;width:96px;height:134px;margin:-67px 0 0 -48px}',
+ '#dealov .deck i{position:absolute;inset:0;border-radius:10px;background:linear-gradient(150deg,#6b1030,#34061a 70%);border:1px solid rgba(201,162,39,.75);box-shadow:0 12px 26px rgba(0,0,0,.55),inset 0 0 0 3px rgba(201,162,39,.18);animation:dshShuf .6s ease-in-out infinite}',
+ '#dealov .deck i:nth-child(1){--x:-7px;--y:5px;--r:-7deg}',
+ '#dealov .deck i:nth-child(2){--x:6px;--y:-4px;--r:6deg;animation-delay:.08s}',
+ '#dealov .deck i:nth-child(3){--x:-2px;--y:-8px;--r:-2deg;animation-delay:.16s}',
+ '#dealov .deck i:nth-child(4){--x:9px;--y:7px;--r:9deg;animation-delay:.24s}',
+ '#dealov .deck i:nth-child(5){--x:-11px;--y:-2px;--r:-11deg;animation-delay:.32s}',
+ '#dealov .fly{position:absolute;left:50%;top:50%;width:min(82vw,320px);height:min(54vh,300px);margin:calc(min(54vh,300px) / -2) 0 0 calc(min(82vw,320px) / -2);opacity:0;perspective:900px}',
+ '#dealov .fly.out{opacity:1;animation:dshFly .55s cubic-bezier(.2,.8,.2,1) forwards}',
+ '#dealov .fly .inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.3,.7,.2,1)}',
+ '#dealov .fly.flip .inner{transform:rotateY(180deg)}',
+ '#dealov .face{position:absolute;inset:0;border-radius:16px;overflow:hidden;-webkit-backface-visibility:hidden;backface-visibility:hidden}',
+ '#dealov .face.back{background:linear-gradient(150deg,#6b1030,#2c0514 70%);border:1px solid rgba(201,162,39,.8);box-shadow:0 20px 44px rgba(0,0,0,.6),inset 0 0 0 4px rgba(201,162,39,.22)}',
+ '#dealov .face.back::after{content:"";position:absolute;inset:12px;border:1px solid rgba(201,162,39,.42);border-radius:10px;background-image:repeating-linear-gradient(45deg,rgba(201,162,39,.10) 0 2px,transparent 2px 9px),repeating-linear-gradient(-45deg,rgba(201,162,39,.10) 0 2px,transparent 2px 9px)}',
+ '#dealov .face.front{transform:rotateY(180deg);background:linear-gradient(160deg,#fffaf1,#f3e4cc 62%,#ecd9ba);border:1px solid rgba(201,162,39,.85);box-shadow:0 20px 44px rgba(0,0,0,.55),inset 0 0 0 6px rgba(201,162,39,.13)}',
+ '#dealov .face.front::before{content:"";position:absolute;inset:9px;border:1px solid rgba(190,150,45,.5);border-radius:11px}',
+ '#dealov .fq{position:absolute;inset:38px 26px;display:flex;align-items:center;justify-content:center;text-align:center;font:600 18px/1.75 Georgia,"Songti SC","Noto Serif SC",serif;color:#38220f}',
+ '#dealov p{position:absolute;bottom:11%;color:#e8c9a3;font:500 12px/1 Georgia,serif;letter-spacing:6px;opacity:.8;animation:dshFadeUp .5s ease}',
+ '.card{position:relative;background:linear-gradient(160deg,#fffaf1,#f4e5cd 60%,#ecd8b8)!important;border:1px solid rgba(201,162,39,.85)!important;border-radius:18px!important;box-shadow:0 18px 38px rgba(0,0,0,.42),inset 0 0 0 1px rgba(255,255,255,.65),inset 0 0 0 6px rgba(201,162,39,.13)!important;color:#33200f!important;font-family:Georgia,"Songti SC","Noto Serif SC",serif!important}',
+ '.card::before{content:"";position:absolute;inset:9px;border:1px solid rgba(190,150,45,.5);border-radius:12px;pointer-events:none}',
+ '.card .orn{position:absolute;color:rgba(170,130,35,.55);font-size:14px;line-height:1;pointer-events:none}',
+ '.card .orn.tl{top:13px;left:14px}.card .orn.tr{top:13px;right:14px;transform:scaleX(-1)}.card .orn.bl{bottom:13px;left:14px;transform:scaleY(-1)}.card .orn.br{bottom:13px;right:14px;transform:scale(-1,-1)}',
+ '.card .tag{color:#9a6a12!important;letter-spacing:2px!important;font-weight:600!important}',
+ '.card .q{font-size:21px!important;line-height:1.78!important;letter-spacing:.4px!important;color:#33200f!important}',
+ '.card .extra{border-top:1px solid rgba(190,150,45,.35)!important;color:#8c2648!important;font-style:italic}',
+ '.card.dealing{animation:dshDeal .5s cubic-bezier(.22,.9,.24,1)}',
+ '#q.dealing{animation:dshFadeUp .4s ease .06s both}'
+ ].join('');
  var ds=document.createElement('style');ds.textContent=DEAL_CSS;document.head.appendChild(ds);
  function dealOverlay(){
-  if(document.getElementById('dealov'))return;
+  if(document.getElementById('dealov'))return null;
   var d=document.createElement('div');d.id='dealov';
-  d.innerHTML='<div class="stk"><i></i><i></i><i></i></div><p>洗 牌 中</p>';
+  d.innerHTML='<div class="deck"><i></i><i></i><i></i><i></i><i></i></div>'+
+   '<div class="fly"><div class="inner"><div class="face back"></div><div class="face front"><div class="fq"></div></div></div></div>'+
+   '<p>洗 牌 中</p>';
   document.body.appendChild(d);
-  setTimeout(function(){if(d.parentNode)d.parentNode.removeChild(d)},820);
+  return d;
  }
  var qEl=null,lastQ='';
  function hookDeal(){
@@ -1082,20 +1108,42 @@ build=function(){
    try{if(navigator.vibrate)navigator.vibrate(12)}catch(e){}
   });
   obs.observe(q,{childList:true,characterData:true,subtree:true});
+  if(card.appendChild&&!card.querySelector('.orn')){
+   ['tl','tr','bl','br'].forEach(function(pos){
+    var o=document.createElement('span');o.className='orn '+pos;o.textContent='❧';card.appendChild(o);
+   });
+  }
  }
  if(startBtn)startBtn.addEventListener('click',function(){
-  dealOverlay();
+  var ov=dealOverlay();
+  setTimeout(hookDeal,120);
   setTimeout(function(){
-   hookDeal();
+   if(!ov)return;
+   var fly=ov.querySelector('.fly');
+   if(fly)fly.classList.add('out');
+   var src=document.querySelector('#q');
+   var fq=ov.querySelector('.fq');
+   if(src&&fq)fq.textContent=src.textContent||'';
+  },700);
+  setTimeout(function(){
+   if(!ov)return;
+   var fly=ov.querySelector('.fly');
+   if(fly){fly.style.opacity='1';fly.classList.add('flip')}
+  },1080);
+  setTimeout(function(){
+   if(ov){
+    ov.classList.add('gone');
+    setTimeout(function(){if(ov.parentNode)ov.parentNode.removeChild(ov)},380);
+   }
    var c=document.querySelector('.card');
    if(c){c.classList.remove('dealing');void c.offsetWidth;c.classList.add('dealing')}
-  },900);
+  },1780);
  },true);
 
  var badge=document.createElement("div");
  badge.setAttribute("id","verbadge");
  badge.style.cssText="position:fixed;right:8px;bottom:8px;font-size:10px;color:rgba(255,215,227,.55);letter-spacing:.5px;pointer-events:none;z-index:99";
- badge.textContent="v11 · 2026-10-31 更新";
+ badge.textContent="v12 · 2026-10-31 更新";
  document.body.appendChild(badge);
  console.log('PARTS_READY');
 })();
