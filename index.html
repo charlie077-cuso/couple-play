@@ -1064,7 +1064,9 @@ build=function(){
  '#dealov .deck i:nth-child(3){--x:-2px;--y:-8px;--r:-2deg;animation-delay:.16s}',
  '#dealov .deck i:nth-child(4){--x:9px;--y:7px;--r:9deg;animation-delay:.24s}',
  '#dealov .deck i:nth-child(5){--x:-11px;--y:-2px;--r:-11deg;animation-delay:.32s}',
- '#dealov .fly{position:absolute;left:50%;top:50%;width:min(82vw,320px);height:min(54vh,300px);margin:calc(min(54vh,300px) / -2) 0 0 calc(min(82vw,320px) / -2);opacity:0;perspective:900px}',
+ '@keyframes dshSettle{0%{transform:scale(1.014)}100%{transform:none}}',
+ '.card.settling{animation:dshSettle .32s ease}',
+ '#dealov .fly{position:absolute;left:50%;top:50%;width:min(82vw,320px);height:min(54vh,300px);margin:calc(min(54vh,300px) / -2) 0 0 calc(min(82vw,320px) / -2);opacity:0;perspective:900px;will-change:transform,opacity}',
  '#dealov .fly.out{opacity:1;animation:dshFly .55s cubic-bezier(.2,.8,.2,1) forwards}',
  '#dealov .fly .inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.3,.7,.2,1)}',
  '#dealov .fly.flip .inner{transform:rotateY(180deg)}',
@@ -1116,6 +1118,8 @@ build=function(){
  }
  if(startBtn)startBtn.addEventListener('click',function(){
   var ov=dealOverlay();
+  var real=document.querySelector('.card');
+  if(real&&real.style)real.style.visibility='hidden';
   setTimeout(hookDeal,120);
   setTimeout(function(){
    if(!ov)return;
@@ -1124,26 +1128,48 @@ build=function(){
    var src=document.querySelector('#q');
    var fq=ov.querySelector('.fq');
    if(src&&fq)fq.textContent=src.textContent||'';
-  },700);
+  },620);
   setTimeout(function(){
    if(!ov)return;
    var fly=ov.querySelector('.fly');
    if(fly){fly.style.opacity='1';fly.classList.add('flip')}
-  },1080);
+  },980);
   setTimeout(function(){
-   if(ov){
-    ov.classList.add('gone');
-    setTimeout(function(){if(ov.parentNode)ov.parentNode.removeChild(ov)},380);
+   if(!ov)return;
+   var fly=ov.querySelector('.fly');
+   var r=real?real.getBoundingClientRect():null;
+   var f=fly?fly.getBoundingClientRect():null;
+   if(fly&&r&&f&&r.width>20&&f.width>20){
+    var s=Math.min(r.width/f.width,r.height/f.height);
+    var dx=(r.left+r.width/2)-(f.left+f.width/2);
+    var dy=(r.top+r.height/2)-(f.top+f.height/2);
+    var cur='';
+    try{if(typeof getComputedStyle==='function')cur=getComputedStyle(fly).transform||''}catch(e){}
+    fly.style.animation='none';
+    fly.style.transformOrigin='50% 50%';
+    fly.style.transition='none';
+    fly.style.transform=(cur&&cur!=='none')?cur:'none';
+    void fly.offsetWidth;
+    fly.style.transition='transform .42s cubic-bezier(.25,.8,.25,1),opacity .42s ease';
+    fly.style.transform='translate('+dx.toFixed(1)+'px,'+dy.toFixed(1)+'px) scale('+s.toFixed(3)+')';
+    fly.style.opacity='1';
    }
-   var c=document.querySelector('.card');
-   if(c){c.classList.remove('dealing');void c.offsetWidth;c.classList.add('dealing')}
-  },1780);
+   ov.classList.add('gone');
+  },1620);
+  setTimeout(function(){
+   if(ov&&ov.parentNode)ov.parentNode.removeChild(ov);
+   if(real){
+    if(real.style)real.style.visibility='';
+    if(real.classList){real.classList.remove('dealing');real.classList.add('settling');
+     setTimeout(function(){if(real.classList)real.classList.remove('settling')},340)}
+   }
+  },2080);
  },true);
 
  var badge=document.createElement("div");
  badge.setAttribute("id","verbadge");
  badge.style.cssText="position:fixed;right:8px;bottom:8px;font-size:10px;color:rgba(255,215,227,.55);letter-spacing:.5px;pointer-events:none;z-index:99";
- badge.textContent="v12 · 2026-10-31 更新";
+ badge.textContent="v13 · 2026-10-31 更新";
  document.body.appendChild(badge);
  console.log('PARTS_READY');
 })();
