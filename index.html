@@ -1056,8 +1056,8 @@ build=function(){
  '@keyframes dshFadeUp{0%{opacity:0;transform:translateY(10px)}100%{opacity:1;transform:none}}',
  '@keyframes dshDeal{0%{opacity:0;transform:translateY(34px) rotateX(30deg) scale(.94)}55%{opacity:1;transform:translateY(-4px) rotateX(0) scale(1.01)}100%{opacity:1;transform:none}}',
  '#dealov{position:fixed;inset:0;z-index:999;display:grid;place-items:center;background:none;overflow:hidden}',
- '#dealov .bg{position:absolute;inset:0;background:radial-gradient(120% 80% at 50% 0%,#4a0a24 0%,#1a0410 55%,#0a0104 100%);opacity:1;transition:opacity .4s ease;will-change:opacity}',
- '#dealov.gone .bg{opacity:0}',
+ '#dealov .bg{position:absolute;inset:0;background:radial-gradient(120% 80% at 50% 0%,#4a0a24 0%,#1a0410 55%,#0a0104 100%);clip-path:circle(140% at 50% 50%);transition:clip-path .62s cubic-bezier(.4,0,.2,1),opacity .62s ease;will-change:clip-path,opacity}',
+ '#dealov.gone .bg{clip-path:circle(0% at 50% 50%);opacity:.92}',
  '#dealov .deck,#dealov p{transition:opacity .28s ease}',
  '#dealov.gone .deck,#dealov.gone p{opacity:0}',
  '#dealov .fly{z-index:3}',
@@ -1072,9 +1072,13 @@ build=function(){
  '.card.settling{animation:dshSettle .32s ease}',
  '#dealov .fly{position:absolute;left:50%;top:50%;width:min(82vw,320px);height:min(54vh,300px);margin:calc(min(54vh,300px) / -2) 0 0 calc(min(82vw,320px) / -2);opacity:0;perspective:900px;will-change:transform,opacity}',
  '#dealov .fly.out{opacity:1;animation:dshFly .6s cubic-bezier(.2,.85,.2,1) forwards}',
- '#dealov .fly .inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.3,.7,.2,1)}',
+ '#dealov .fly .inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.3,.7,.2,1),opacity .5s ease}',
  '#dealov .fly.flip .inner{transform:rotateY(180deg)}',
- '#dealov .face{position:absolute;inset:0;border-radius:16px;overflow:hidden;-webkit-backface-visibility:hidden;backface-visibility:hidden}',
+ '#dealov .fly.fade .inner{opacity:0}',
+ '#dealov .face{position:absolute;inset:0;border-radius:16px;overflow:hidden;-webkit-backface-visibility:hidden;backface-visibility:hidden;transition:box-shadow .55s ease}',
+ '#dealov .fly.landed .face{box-shadow:0 9px 22px rgba(0,0,0,.38)!important}',
+ '#q{transition:opacity .5s ease,transform .5s ease}',
+ '.card.qfade #q{opacity:0;transform:translateY(7px)}',
  '#dealov .face.back{background:linear-gradient(150deg,#6b1030,#2c0514 70%);border:1px solid rgba(201,162,39,.8);box-shadow:0 20px 44px rgba(0,0,0,.6),inset 0 0 0 4px rgba(201,162,39,.22)}',
  '#dealov .face.back::after{content:"";position:absolute;inset:12px;border:1px solid rgba(201,162,39,.42);border-radius:10px;background-image:repeating-linear-gradient(45deg,rgba(201,162,39,.10) 0 2px,transparent 2px 9px),repeating-linear-gradient(-45deg,rgba(201,162,39,.10) 0 2px,transparent 2px 9px)}',
  '#dealov .face.front{transform:rotateY(180deg);background:linear-gradient(160deg,#fffaf1,#f3e4cc 62%,#ecd9ba);border:1px solid rgba(201,162,39,.85);box-shadow:0 20px 44px rgba(0,0,0,.55),inset 0 0 0 6px rgba(201,162,39,.13)}',
@@ -1155,24 +1159,38 @@ build=function(){
   },1240);
   setTimeout(function(){
    if(!ov)return;
+   var fly=ov.querySelector('.fly');
+   if(fly)fly.classList.add('landed');
+  },1520);
+  setTimeout(function(){
+   if(!ov)return;
    var card=document.querySelector('.card')||real;
    if(card){
-    if(card.classList){card.classList.remove('dealing');card.classList.remove('settling')}
+    if(card.classList){card.classList.remove('dealing');card.classList.remove('settling');card.classList.add('qfade')}
     if(card.style)card.style.visibility='';
    }
    if(real&&real!==card&&real.style)real.style.visibility='';
    ov.classList.add('gone');
   },1790);
   setTimeout(function(){
+   var card=document.querySelector('.card');
+   if(card&&card.classList)card.classList.remove('qfade');
+  },1870);
+  setTimeout(function(){
+   if(!ov)return;
+   var fly=ov.querySelector('.fly');
+   if(fly)fly.classList.add('fade');
+  },1980);
+  setTimeout(function(){
    if(ov&&ov.parentNode)ov.parentNode.removeChild(ov);
    try{document.body.style.overflow=''}catch(e){}
-  },2260);
+  },2480);
  },true);
 
  var badge=document.createElement("div");
  badge.setAttribute("id","verbadge");
  badge.style.cssText="position:fixed;right:8px;bottom:8px;font-size:10px;color:rgba(255,215,227,.55);letter-spacing:.5px;pointer-events:none;z-index:99";
- badge.textContent="v16 · 2026-10-31 更新";
+ badge.textContent="v17 · 2026-10-31 更新";
  document.body.appendChild(badge);
  console.log('PARTS_READY');
 })();
