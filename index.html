@@ -862,6 +862,20 @@ build=function(){
  for(k in C)C[k]=(C[k]||[]).filter(function(c){return !CLOTH.test(c.s||"")&&!/衣服/.test(c.s||"")});
  var PM=[["胸",/胸|乳/],["脖子",/脖|颈|锁骨|喉/],["耳朵",/耳/],["嘴",/嘴|唇|吻|亲|含|吸|舌/],["腰",/腰/],["背",/背|后背/],["腿",/腿|膝|大腿/],["手",/手|指/],["脚",/脚|足/],["臀",/臀|屁股/],["脸",/脸|颊/],["头",/头发|头顶/]];
  window.__ORIG={T:JSON.parse(JSON.stringify(T)),D:JSON.parse(JSON.stringify(D)),O:JSON.parse(JSON.stringify(O)),PU:JSON.parse(JSON.stringify(PU)),C:JSON.parse(JSON.stringify(C))};
+ (function(){
+  var NX4={
+   T:{w:["你想让我用嘴把你的锁骨吸红吗","你希望我咬你的时候留多重","你想让我在你耳边喘给你听吗","你会因为我按住你不让动而兴奋吗","你希望我把你的手腕按过头顶吗","你想让我贴着你的身体磨你吗","你希望我一边亲你一边说脏话吗","你想让我亲到你说不出话吗","你希望我把手放在你的大腿内侧吗","你想让我抓着你的腰不放吗","你希望我在你身上留几个印子","你想让我把脸埋进你胸口不放吗"],
+    z:["你希望我抱得有多紧","你想让我亲你的时候用多大力气"]},
+   D:{w:["把我按在身下，亲到我说不出话","用牙咬住我的锁骨，慢慢加重","贴着我的身体慢慢磨，看着我","把我的双手按过头顶，别让我动","在我耳边喘给我听","一边亲我一边说一句脏话","抓着我的腰，把我拉紧贴着你","亲我的大腿内侧，再抬头看我","把脸埋进我胸口，咬着不放","让我坐在你腿上，贴紧你慢慢动","咬住我的肩膀，留下一个印子","用手掌按住我的后颈，把我拉近亲"],
+    z:["把我的手腕按在床上 10 秒","贴着我的耳朵喘一口气"]},
+   O:{w:["跪着，抬头看着我，说一句最想让我对你说的话","把手放在我的大腿内侧，别动，等我说可以","跪好，用嘴把我的锁骨吸红，我没说停就不许停","贴着我耳朵，用最低的声音说三句脏话","把我按在墙上，亲到我出声，然后退开","从背后抱住我，咬着我的肩膀说一句想要我","跪着，替我把睡衣的肩带往下拉一点，然后停手","贴着我的身体磨 20 秒，不许出声","用手抓着我的腰，把我拉到你面前","跪好，抬头看我，说你今晚想被怎么对待"],
+    z:["跪着，把手放在我膝盖上，等我说可以","贴着我耳朵说一句最想做的事"]}
+  };
+  var o=window.__ORIG,kk,qq;
+  for(kk in NX4.T){if(!o.T[kk])o.T[kk]=[];for(qq=0;qq<NX4.T[kk].length;qq++)o.T[kk].push(NX4.T[kk][qq])}
+  for(kk in NX4.D){if(!o.D[kk])o.D[kk]=[];for(qq=0;qq<NX4.D[kk].length;qq++)o.D[kk].push(NX4.D[kk][qq])}
+  for(kk in NX4.O){if(!o.O[kk])o.O[kk]=[];for(qq=0;qq<NX4.O[kk].length;qq++)o.O[kk].push(NX4.O[kk][qq])}
+ })();
  function allowed(s){
   if(!s)return true;
   for(var q=0;q<PM.length;q++){var p=PM[q][0];if(PM[q][1].test(s)&&!S.parts[p])return false}
@@ -878,7 +892,12 @@ build=function(){
  var PN=["嘴","脖子","耳朵","胸","腰","背","腿","手","脚","臀","脸","头"];
  S.parts={};
  for(i=0;i<PN.length;i++)S.parts[PN[i]]=1;
- if(typeof planOf==="function"){var _po=planOf;planOf=function(m,lv){if(m==="truth"&&lv==="w")return [["z",6],["w",24]];return _po(m,lv)}}
+ if(typeof planOf==="function"){var _po=planOf;planOf=function(m,lv){
+  var P={truth:{x:[["x",12],["z",18]],z:[["z",8],["w",22]],w:[["w",30]]},
+         dare:{x:[["x",6],["z",24]],z:[["z",6],["w",24]],w:[["w",30]]},
+         order:{x:[["x",6],["z",12]],z:[["z",6],["w",14]],w:[["w",20]]},
+         scene:{x:[["x",8]],z:[["z",8]],w:[["w",8]]}};
+  if(P[m]&&P[m][lv])return P[m][lv];return _po(m,lv)}}
  // 热烈档真心话：自建不重复抽卡池
  var BAG={z:[],w:[],zi:0,wi:0};
  function shuffleBag(a){for(var q=a.length-1;q>0;q--){var r=Math.floor(Math.random()*(q+1)),t=a[q];a[q]=a[r];a[r]=t}}
@@ -968,12 +987,53 @@ build=function(){
  }
  if(typeof build==="function"){var _build2=build;build=function(){
   _build2();
-  if(S.mode==="dare"||S.mode==="order"){
-   var plan=planOf(S.mode,S.lvl),deck=[],pi;
-   for(pi=0;pi<plan.length;pi++)deck=deck.concat(takeUnique(S.mode,plan[pi][0],plan[pi][1]));
-   shuffleBag(deck);S.deck=deck;S.i=0;
+  var deck=[],pi,plan,k,lv2,n,got,c2,guard2;
+  if(S.mode==="scene"){deck=drawDeck("scene",S.lvl,8)}
+  else if(S.mode==="truth"||S.mode==="dare"||S.mode==="order"){
+   plan=planOf(S.mode,S.lvl);
+   for(pi=0;pi<plan.length;pi++){
+    lv2=plan[pi][0];n=plan[pi][1];got=drawDeck(S.mode,lv2,n);guard2=0;
+    while(got.length<n&&guard2++<4){shortage(S.mode);var more=drawDeck(S.mode,lv2,n-got.length);if(!more.length)break;got=got.concat(more)}
+    var seenK={},tmp=[];
+    for(k=0;k<got.length;k++){var bk=bkey(got[k].q);if(seenK[bk])continue;seenK[bk]=1;tmp.push(got[k])}
+    got=tmp;
+    for(k=0;k<got.length;k++){c2=got[k];deck.push({k:c2.k,q:c2.q,lv:lv2,p:(S.mode==="order"&&PU[lv2]&&PU[lv2].length)?PU[lv2][k%PU[lv2].length]:undefined})}
+   }
+  }
+  if(deck.length){
+   var dseen={},dd=[],dk;
+   for(dk=0;dk<deck.length;dk++){var db=bkey(deck[dk].q);if(dseen[db])continue;dseen[db]=1;dd.push(deck[dk])}
+   deck=dd;shuffleBag(deck);S.deck=deck;S.i=0
   }
  }}
+ var USEDB={};
+ function bkey(q){return stripTail(String(q)).replace(/\s+/g,"")}
+ function allCardsOf(mode,lv){
+  var out=[],q,b,tails,r,src,bank;
+  if(mode==="scene"){src=(C[lv]||[]);for(q=0;q<src.length;q++)out.push({k:"c",q:src[q].s,lv:lv});return out}
+  bank=mode==="truth"?T:mode==="dare"?D:O;
+  src=bank[lv]||[];tails=mode==="truth"?(lv==="w"?TW:(lv==="z"?TZ.concat(["说完看着我。","小声说。"]):["说具体一点。","小声说。","说完看着我。"])):(mode==="dare"?DT:OT);
+  for(q=0;q<src.length;q++){
+   b=stripTail(src[q]);if(!b)continue;
+   if(tails.length){for(r=0;r<tails.length;r++)if(tailFit(b,tails[r]))out.push({k:mode==="dare"?"d":"o",q:b+" "+tails[r],lv:lv})}
+   else out.push({k:"t",q:b,lv:lv});
+  }
+  shuffleBag(out);return out;
+ }
+ function shortage(mode){for(var kk in USEDB)if(kk===mode||kk.indexOf(mode+"|")===0)USEDB[kk]={}}
+ function drawDeck(mode,lv,n){
+  var pool=allCardsOf(mode,lv);if(!pool.length)return [];
+  var uk=mode;if(!USEDB[uk])USEDB[uk]={};
+  var out=[],inDeck={},guard=0,pi=0,c,b,seenN;
+  while(out.length<n&&guard++<4000){
+   if(pi>=pool.length){shortage(mode);pool=allCardsOf(mode,lv);pi=0}
+   c=pool[pi++];b=bkey(c.q);seenN=USEDB[uk][b]||0;
+   if(inDeck[b]||seenN>=2)continue;
+   inDeck[b]=1;USEDB[uk][b]=seenN+1;out.push(c);
+  }
+  return out;
+ }
+ window.__bkey=bkey;
  var chips=document.querySelectorAll("#parts .chip");
  for(i=0;i<chips.length;i++){chips[i].onclick=function(){var p=this.getAttribute("data-p");if(S.parts[p]){delete S.parts[p];this.classList.remove("on")}else{S.parts[p]=1;this.classList.add("on")}}}
  var pbtn=$('#pbtn');
